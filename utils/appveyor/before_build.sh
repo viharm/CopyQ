@@ -21,14 +21,8 @@ if [[ $WITH_NATIVE_NOTIFICATIONS == ON ]]; then
     appveyor PushArtifact "$APP-dependencies.zip" -DeploymentName "CopyQ Dependencies"
 fi
 
-if [[ -n ${CMAKE_GENERATOR_ARCH:-} ]]; then
-    cmake_args=(-A "$CMAKE_GENERATOR_ARCH")
-else
-    cmake_args=()
-fi
-
 cmake -B"$BUILD_PATH" -DCMAKE_BUILD_TYPE=Release \
-    -G "$CMAKE_GENERATOR" "${cmake_args[@]}" \
+    -G "$CMAKE_GENERATOR" -A "$CMAKE_GENERATOR_ARCH" \
     -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH" \
     -DCMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION=. \
     -DWITH_NATIVE_NOTIFICATIONS="$WITH_NATIVE_NOTIFICATIONS" \
