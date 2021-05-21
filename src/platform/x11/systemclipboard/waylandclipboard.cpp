@@ -70,19 +70,26 @@ protected:
         m_receivedFormats << mime_type;
     }
 
-    QVariant retrieveData(const QString &mimeType, QVariant::Type type) const override;
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    QVariant retrieveData(const QString &mimeType, QVariant::Type) const override;
+#else
+    QVariant retrieveData(const QString &mimetype, QMetaType) const override;
+#endif
 
 private:
     static bool readData(int fd, QByteArray &data);
     QStringList m_receivedFormats;
 };
 
-QVariant DataControlOffer::retrieveData(const QString &mimeType, QVariant::Type type) const
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+QVariant DataControlOffer::retrieveData(const QString &mimeType, QVariant::Type) const
+#else
+QVariant DataControlOffer::retrieveData(const QString &mimeType, QMetaType) const
+#endif
 {
     if (!hasFormat(mimeType)) {
         return QVariant();
     }
-    Q_UNUSED(type)
 
     int pipeFds[2];
     if (pipe(pipeFds) != 0) {

@@ -274,7 +274,7 @@ public:
         : m_server(nullptr)
         , m_env(QProcessEnvironment::systemEnvironment())
     {
-        m_env.insert("COPYQ_LOG_LEVEL", "DEBUG");
+        m_env.insert("COPYQ_LOG_LEVEL", "TRACE");
         m_env.insert("COPYQ_SESSION_COLOR", defaultSessionColor);
         m_env.insert("COPYQ_SESSION_NAME", "TEST");
     }

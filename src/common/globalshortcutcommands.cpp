@@ -25,6 +25,7 @@
 
 #include <QCoreApplication>
 #include <QLocale>
+#include <QVector>
 
 #ifndef NO_GLOBAL_SHORTCUTS
 
@@ -74,29 +75,30 @@ Command createGlobalShortcut(const QString &name, const QString &script, IconId 
 
 QVector<Command> globalShortcutCommands()
 {
-    return QVector<Command>()
-            << createGlobalShortcut( AddCommandDialog::tr("Show/hide main window"), "toggle()", IconListAlt )
-            << createGlobalShortcut( AddCommandDialog::tr("Show the tray menu"), "menu()", IconInbox )
-            << createGlobalShortcut( AddCommandDialog::tr("Show main window under mouse cursor"), "showAt()", IconListAlt )
-            << createGlobalShortcut( AddCommandDialog::tr("Edit clipboard"), "edit(-1)", IconEdit )
-            << createGlobalShortcut( AddCommandDialog::tr("Edit first item"), "edit(0)", IconEdit )
-            << createGlobalShortcut( AddCommandDialog::tr("Copy second item"), "select(1)", IconCopy )
-            << createGlobalShortcut( AddCommandDialog::tr("Show action dialog"), "action()", IconCog )
-            << createGlobalShortcut( AddCommandDialog::tr("Create new item"), "edit()", IconAsterisk )
-            << createGlobalShortcut( AddCommandDialog::tr("Copy next item"), "next()", IconArrowDown )
-            << createGlobalShortcut( AddCommandDialog::tr("Copy previous item"), "previous()", IconArrowUp )
-            << createGlobalShortcut( AddCommandDialog::tr("Paste clipboard as plain text"), pasteAsPlainTextScript("clipboard()"), IconPaste )
-            << createGlobalShortcut( AddCommandDialog::tr("Disable clipboard storing"), "disable()", IconEyeSlash )
-            << createGlobalShortcut( AddCommandDialog::tr("Enable clipboard storing"), "enable()", IconEye )
-            << createGlobalShortcut( AddCommandDialog::tr("Paste and copy next"), "paste(); next()", IconArrowCircleDown )
-            << createGlobalShortcut( AddCommandDialog::tr("Paste and copy previous"), "paste(); previous()", IconArrowCircleUp )
-            << createGlobalShortcut( AddCommandDialog::tr("Take screenshot"), commandScreenshot, IconCamera )
-            << createGlobalShortcut( AddCommandDialog::tr("Paste current date and time"), commandPasteDateTime(), IconClock );
+    return {
+        createGlobalShortcut( AddCommandDialog::tr("Show/hide main window"), "toggle()", IconListAlt ),
+        createGlobalShortcut( AddCommandDialog::tr("Show the tray menu"), "menu()", IconInbox ),
+        createGlobalShortcut( AddCommandDialog::tr("Show main window under mouse cursor"), "showAt()", IconListAlt ),
+        createGlobalShortcut( AddCommandDialog::tr("Edit clipboard"), "edit(-1)", IconEdit ),
+        createGlobalShortcut( AddCommandDialog::tr("Edit first item"), "edit(0)", IconEdit ),
+        createGlobalShortcut( AddCommandDialog::tr("Copy second item"), "select(1)", IconCopy ),
+        createGlobalShortcut( AddCommandDialog::tr("Show action dialog"), "action()", IconCog ),
+        createGlobalShortcut( AddCommandDialog::tr("Create new item"), "edit()", IconAsterisk ),
+        createGlobalShortcut( AddCommandDialog::tr("Copy next item"), "next()", IconArrowDown ),
+        createGlobalShortcut( AddCommandDialog::tr("Copy previous item"), "previous()", IconArrowUp ),
+        createGlobalShortcut( AddCommandDialog::tr("Paste clipboard as plain text"), pasteAsPlainTextScript("clipboard()"), IconPaste ),
+        createGlobalShortcut( AddCommandDialog::tr("Disable clipboard storing"), "disable()", IconEyeSlash ),
+        createGlobalShortcut( AddCommandDialog::tr("Enable clipboard storing"), "enable()", IconEye ),
+        createGlobalShortcut( AddCommandDialog::tr("Paste and copy next"), "paste(); next()", IconArrowCircleDown ),
+        createGlobalShortcut( AddCommandDialog::tr("Paste and copy previous"), "paste(); previous()", IconArrowCircleUp ),
+        createGlobalShortcut( AddCommandDialog::tr("Take screenshot"), commandScreenshot, IconCamera ),
+        createGlobalShortcut( AddCommandDialog::tr("Paste current date and time"), commandPasteDateTime(), IconClock )
+    };
 }
 #else
 QVector<Command> globalShortcutCommands()
 {
-    return QVector<Command>();
+    return {};
 }
 #endif
 

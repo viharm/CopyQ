@@ -20,12 +20,13 @@
 #ifndef ITEMWIDGET_H
 #define ITEMWIDGET_H
 
+#include "common/command.h"
 #include "tests/testinterface.h"
 
 #include <QStringList>
+#include <QtContainerFwd>
 #include <QtPlugin>
 #include <QVariantMap>
-#include <QVector>
 #include <QWidget>
 
 #include <memory>
@@ -35,7 +36,6 @@ class QAbstractItemModel;
 class QTextEdit;
 class QIODevice;
 class QModelIndex;
-struct Command;
 
 class ItemLoaderInterface;
 using ItemLoaderPtr = std::shared_ptr<ItemLoaderInterface>;

@@ -21,6 +21,8 @@
 
 #include "x11platformclipboard.h"
 
+#include "x11info.h"
+
 #include "common/common.h"
 #include "common/mimetypes.h"
 #include "common/log.h"
@@ -33,7 +35,6 @@
 
 #include <QClipboard>
 #include <QMimeData>
-#include <QX11Info>
 
 namespace {
 
@@ -44,10 +45,10 @@ constexpr auto maxRetryCount = 3;
 /// Return true only if selection is incomplete, i.e. mouse button or shift key is pressed.
 bool isSelectionIncomplete()
 {
-    if (!QX11Info::isPlatformX11())
+    if (!X11Info::isPlatformX11())
         return false;
 
-    auto display = QX11Info::display();
+    auto display = X11Info::display();
 
     // If mouse button or shift is pressed then assume that user is selecting text.
     XEvent event{};
@@ -68,7 +69,7 @@ X11PlatformClipboard::X11PlatformClipboard()
     m_selectionData.mode = ClipboardMode::Selection;
 
     // Create Wayland clipboard instance so it can start receiving new data.
-    if ( !QX11Info::isPlatformX11() )
+    if ( !X11Info::isPlatformX11() )
         SystemClipboard::instance();
 }
 
@@ -85,7 +86,7 @@ void X11PlatformClipboard::startMonitoring(const QStringList &formats)
         m_selectionData.enabled = false;
     }
 
-    if ( !QX11Info::isPlatformX11() ) {
+    if ( !X11Info::isPlatformX11() ) {
         auto clipboard = SystemClipboard::instance();
         if (clipboard != nullptr) {
             connect(clipboard, &SystemClipboard::changed,
@@ -136,7 +137,7 @@ QVariantMap X11PlatformClipboard::data(ClipboardMode mode, const QStringList &fo
 
 void X11PlatformClipboard::setData(ClipboardMode mode, const QVariantMap &dataMap)
 {
-    if ( QX11Info::isPlatformX11() ) {
+    if ( X11Info::isPlatformX11() ) {
         // WORKAROUND: Avoid getting X11 warning "QXcbClipboard: SelectionRequest too old".
         QCoreApplication::processEvents();
         DummyClipboard::setData(mode, dataMap);
@@ -149,7 +150,7 @@ void X11PlatformClipboard::setData(ClipboardMode mode, const QVariantMap &dataMa
 
 const QMimeData *X11PlatformClipboard::mimeData(ClipboardMode mode) const
 {
-    if ( QX11Info::isPlatformX11() )
+    if ( X11Info::isPlatformX11() )
         return DummyClipboard::mimeData(mode);
 
     // Avoid deadlock by providing own clipboard using Qt
@@ -258,7 +259,7 @@ void X11PlatformClipboard::updateClipboardData(X11PlatformClipboard::ClipboardDa
 
     // Retry to retrieve clipboard data few times.
     if (!data) {
-        if ( !QX11Info::isPlatformX11() )
+        if ( !X11Info::isPlatformX11() )
             return;
 
         if (clipboardData->retry < maxRetryCount) {
