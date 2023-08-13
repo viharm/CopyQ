@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef SCRIPTABLEPROXY_H
 #define SCRIPTABLEPROXY_H
@@ -50,6 +33,10 @@ struct NamedValue {
     QVariant value;
 };
 
+struct VariantMapList {
+    QVector<QVariantMap> items;
+};
+
 using NamedValueList = QVector<NamedValue>;
 
 struct ScriptablePath {
@@ -64,17 +51,19 @@ struct ItemSelection {
 Q_DECLARE_METATYPE(NamedValueList)
 Q_DECLARE_METATYPE(ScriptablePath)
 Q_DECLARE_METATYPE(NotificationButtons)
-Q_DECLARE_METATYPE(QVector<QVariantMap>)
+Q_DECLARE_METATYPE(VariantMapList)
 Q_DECLARE_METATYPE(Qt::KeyboardModifiers)
 
 #if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 Q_DECLARE_METATYPE(ClipboardMode)
 #endif
 
-QDataStream &operator<<(QDataStream &out, const NotificationButton &button);
-QDataStream &operator>>(QDataStream &in, NotificationButton &button);
+QDataStream &operator<<(QDataStream &out, const NotificationButtons &list);
+QDataStream &operator>>(QDataStream &in, NotificationButtons &list);
 QDataStream &operator<<(QDataStream &out, const NamedValueList &list);
 QDataStream &operator>>(QDataStream &in, NamedValueList &list);
+QDataStream &operator<<(QDataStream &out, const VariantMapList &list);
+QDataStream &operator>>(QDataStream &in, VariantMapList &list);
 QDataStream &operator<<(QDataStream &out, ClipboardMode mode);
 QDataStream &operator>>(QDataStream &in, ClipboardMode &mode);
 QDataStream &operator<<(QDataStream &out, const ScriptablePath &path);
@@ -159,7 +148,7 @@ public slots:
     bool toggleCurrentMenu();
     int findTabIndex(const QString &arg1);
 
-    int menuItems(const QVector<QVariantMap> &items);
+    int menuItems(const VariantMapList &items);
 
     void openActionDialog(const QVariantMap &arg1);
 
@@ -176,8 +165,8 @@ public slots:
     int browserLength(const QString &tabName);
     bool browserOpenEditor(const QString &tabName, const QByteArray &arg1, bool changeClipboard);
 
-    QString browserInsert(const QString &tabName, int row, const QVector<QVariantMap> &items);
-    QString browserChange(const QString &tabName, int row, const QVector<QVariantMap> &items);
+    QString browserInsert(const QString &tabName, int row, const VariantMapList &items);
+    QString browserChange(const QString &tabName, int row, const VariantMapList &items);
 
     QByteArray browserItemData(const QString &tabName, int arg1, const QString &arg2);
     QVariantMap browserItemData(const QString &tabName, int arg1);
@@ -194,8 +183,8 @@ public slots:
     QVariantMap selectedItemData(int selectedIndex);
     bool setSelectedItemData(int selectedIndex, const QVariantMap &data);
 
-    QVector<QVariantMap> selectedItemsData();
-    void setSelectedItemsData(const QVector<QVariantMap> &dataList);
+    VariantMapList selectedItemsData();
+    void setSelectedItemsData(const VariantMapList &dataList);
 
     int createSelection(const QString &tabName);
     int selectionCopy(int id);
@@ -218,6 +207,7 @@ public slots:
     QVariantList selectionGetItemsFormat(int id, const QString &format);
     void selectionSetItemsFormat(int id, const QString &mime, const QVariant &value);
     void selectionMove(int id, int row);
+    void selectionSort(int id, const QVector<int> &indexes);
 
 #ifdef HAS_TESTS
     void sendKeys(const QString &expectedWidgetName, const QString &keys, int delay);

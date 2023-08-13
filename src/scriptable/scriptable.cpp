@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "scriptable.h"
 
@@ -633,8 +616,11 @@ QJSValue fromUnicode(const QString &text, const QJSValue &codecName, Scriptable 
     const auto encoding = encodingFromNameOrThrow(codecName, scriptable);
     if (!encoding)
         return QJSValue();
+    const QStringConverter::Flags flags = *encoding == QStringConverter::Utf8
+        ? QStringConverter::Flag::Default
+        : (QStringConverter::Flag::Default | QStringConverter::Flag::WriteBom);
     return scriptable->newByteArray(
-        QStringEncoder(*encoding).encode(text) );
+        QStringEncoder(*encoding, flags).encode(text) );
 }
 #endif
 
@@ -840,7 +826,7 @@ QJSValue Scriptable::throwError(const QString &errorMessage)
     QJSValue throwFn = evaluateStrict(m_engine,  QStringLiteral(
         "(function(text) {throw new Error(text);})"
     ));
-    const auto exc = throwFn.call(QJSValueList() << errorMessage);
+    const auto exc = throwFn.call({errorMessage});
 #if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
     m_engine->throwError(QJSValue::GenericError, errorMessage);
     return exc;
@@ -2018,13 +2004,13 @@ QJSValue Scriptable::setSelectedItemData()
 
 QJSValue Scriptable::selectedItemsData()
 {
-    return toScriptValue( m_proxy->selectedItemsData(), this );
+    return toScriptValue( m_proxy->selectedItemsData().items, this );
 }
 
 void Scriptable::setSelectedItemsData()
 {
     m_skipArguments = 1;
-    const auto dataList = fromScriptValue<QVector<QVariantMap>>( argument(0), this );
+    const VariantMapList dataList{fromScriptValue<QVector<QVariantMap>>( argument(0), this )};
     m_proxy->setSelectedItemsData(dataList);
 }
 
@@ -2153,7 +2139,7 @@ QJSValue Scriptable::execute()
 
     if ( m_executeStdoutCallback.isCallable() ) {
         const auto arg = toScriptValue(m_executeStdoutLastLine, this);
-        call( "executeStdoutCallback", &m_executeStdoutCallback, QJSValueList() << arg );
+        call( "executeStdoutCallback", &m_executeStdoutCallback, {arg} );
     }
 
     QJSValue actionResult = m_engine->newObject();
@@ -2221,18 +2207,18 @@ QJSValue Scriptable::menuItems()
     const auto text = argument(0);
     if ( text.isString() ) {
         m_skipArguments = -1;
-        QVector<QVariantMap> items;
+        VariantMapList items;
         for (const auto &arg : arguments())
-            items.append(createDataMap(mimeText, arg));
+            items.items.append(createDataMap(mimeText, arg));
         const int i = m_proxy->menuItems(items);
-        if (i == -1 || i >= items.size())
+        if (i == -1 || i >= items.items.size())
             return QString();
-        return getTextData(items[i]);
+        return getTextData(items.items[i]);
     }
 
     m_skipArguments = 1;
-    const auto items = fromScriptValue<QVector<QVariantMap>>(text, this);
-    if ( items.isEmpty() )
+    const VariantMapList items{fromScriptValue<QVector<QVariantMap>>(text, this)};
+    if ( items.items.isEmpty() )
         return -1;
     return m_proxy->menuItems(items);
 }
@@ -2482,7 +2468,7 @@ QJSValue Scriptable::setPointerPosition()
 
     m_proxy->setPointerPosition(x, y);
 
-    // Appearantly, on macOS the pointer position is set only after some time.
+    // Apparently, on macOS the pointer position is set only after some time.
     SleepTimer t(5000);
     while ( m_proxy->pointerPosition() != QPoint(x, y) ) {
         if ( !t.sleep() )
@@ -2850,7 +2836,7 @@ void Scriptable::onExecuteOutput(const QByteArray &output)
         m_executeStdoutLastLine = lines.takeLast();
         if ( !lines.isEmpty() ) {
             const auto arg = toScriptValue(lines, this);
-            call( "executeStdoutCallback", &m_executeStdoutCallback, QJSValueList() << arg );
+            call( "executeStdoutCallback", &m_executeStdoutCallback, {arg} );
         }
     }
 }
@@ -2880,18 +2866,20 @@ void Scriptable::onMonitorClipboardUnchanged(const QVariantMap &data)
     m_proxy->runInternalAction(data, "copyq onClipboardUnchanged");
 }
 
-void Scriptable::onSynchronizeSelection(ClipboardMode sourceMode, const QString &text, uint targetTextHash)
+void Scriptable::onSynchronizeSelection(ClipboardMode sourceMode, uint sourceTextHash, uint targetTextHash)
 {
 #ifdef HAS_MOUSE_SELECTIONS
-    auto data = createDataMap(mimeText, text);
+    QVariantMap data;
+    data[COPYQ_MIME_PREFIX "source-text-hash"] = QByteArray::number(sourceTextHash);
     data[COPYQ_MIME_PREFIX "target-text-hash"] = QByteArray::number(targetTextHash);
     const auto command = sourceMode == ClipboardMode::Clipboard
         ? "copyq --clipboard-access synchronizeToSelection"
         : "copyq --clipboard-access synchronizeFromSelection";
     m_proxy->runInternalAction(data, command);
 #else
-    Q_UNUSED(text)
     Q_UNUSED(sourceMode)
+    Q_UNUSED(sourceTextHash)
+    Q_UNUSED(targetTextHash)
 #endif
 }
 
@@ -3059,7 +3047,7 @@ void Scriptable::showExceptionMessage(const QString &message)
     QtPrivate::QHashCombine hash;
     const auto id = hash(hash(0, title), message);
     const auto notificationId = QString::number(id);
-    m_proxy->showMessage(title, message, QString(QChar(IconExclamationCircle)), 8000, notificationId);
+    m_proxy->showMessage(title, message, QString(QChar(IconCircleExclamation)), 8000, notificationId);
 }
 
 QVector<int> Scriptable::getRows() const
@@ -3201,7 +3189,7 @@ QJSValue Scriptable::changeItem(bool create)
     }
 
     QString error;
-    const QVector<QVariantMap> items = getItemArguments(i, args, &error);
+    const VariantMapList items{getItemArguments(i, args, &error)};
     if ( !error.isEmpty() )
         return throwError(error);
 
@@ -3254,7 +3242,7 @@ QJSValue Scriptable::eval(const QString &script, const QString &label)
 {
     m_stack.prepend(QStringLiteral("eval:") + label);
     COPYQ_LOG_VERBOSE( QStringLiteral("Stack push: %1").arg(m_stack.join('|')) );
-    const auto result = m_safeEval.call(QJSValueList() << QJSValue(script));
+    const auto result = m_safeEval.call({QJSValue(script)});
     m_stack.pop_front();
     COPYQ_LOG_VERBOSE( QStringLiteral("Stack pop: %1").arg(m_stack.join('|')) );
 
@@ -3505,7 +3493,7 @@ void Scriptable::insert(int row, int argumentsBegin, int argumentsEnd)
 {
     m_skipArguments = argumentsEnd;
 
-    const QVector<QVariantMap> items = getItemList(argumentsBegin, argumentsEnd, argumentsArray());
+    const VariantMapList items{getItemList(argumentsBegin, argumentsEnd, argumentsArray())};
     const auto error = m_proxy->browserInsert(m_tabName, row, items);
     if ( !error.isEmpty() )
         throwError(error);
@@ -3589,12 +3577,11 @@ bool Scriptable::hasClipboardFormat(const QString &mime, ClipboardMode mode)
 bool Scriptable::canSynchronizeSelection(ClipboardMode targetMode)
 {
 #ifdef HAS_MOUSE_SELECTIONS
-#   define COPYQ_SYNC_LOG(MESSAGE) \
-        COPYQ_LOG( QStringLiteral("Synchronizing to %1: " MESSAGE) \
-                   .arg(targetMode == ClipboardMode::Clipboard ? "clipboard" : "selection") )
-
     if (!verifyClipboardAccess())
         return false;
+
+    // Make sure a clipboard instance is created so as to monitor any changes;
+    clipboardInstance();
 
     SleepTimer tMin(50);
 
@@ -3603,7 +3590,7 @@ bool Scriptable::canSynchronizeSelection(ClipboardMode targetMode)
     SleepTimer t(5000);
     while ( QGuiApplication::queryKeyboardModifiers() != Qt::NoModifier ) {
         if ( !t.sleep() && !canContinue() ) {
-            COPYQ_SYNC_LOG("Cancelled (keyboard modifiers still being hold)");
+            COPYQ_LOG("Sync: Cancelled - keyboard modifiers still being held");
             return false;
         }
     }
@@ -3615,41 +3602,53 @@ bool Scriptable::canSynchronizeSelection(ClipboardMode targetMode)
     while ( tMin.sleep() ) {}
 
     // Stop if the clipboard/selection text already changed again.
-    const auto sourceData = mimeData(sourceMode);
-    QString sourceText;
-    if (sourceData) {
-        sourceText = cloneText(*sourceData);
-        if (sourceText != getTextData(m_data)) {
-            COPYQ_SYNC_LOG("Cancelled (source text changed)");
-            return false;
+    const QVariantMap sourceData = clipboardInstance()->data(
+        sourceMode, {mimeTextUtf8, mimeText, mimeUriList});
+    QByteArray source;
+    if (!sourceData.isEmpty()) {
+        source = sourceData.value(mimeText).toByteArray();
+        const QString owner = sourceData.value(mimeOwner).toString();
+        if ( owner.isEmpty() && !source.isEmpty() ) {
+            const auto sourceTextHash = m_data.value(COPYQ_MIME_PREFIX "source-text-hash").toByteArray().toUInt();
+            if (sourceTextHash != qHash(source)) {
+                COPYQ_LOG(QStringLiteral("Sync: Cancelled - source text changed"));
+                return false;
+            }
         }
     } else {
-        COPYQ_SYNC_LOG("Failed to fetch source data");
+        COPYQ_LOG("Sync: Failed to fetch source data");
     }
 
-    const auto targetData = mimeData(targetMode);
-    if (targetData) {
-        const QString targetText = cloneText(*targetData);
-        if ( targetData->data(mimeOwner).isEmpty() && !targetText.isEmpty() ) {
+    const QVariantMap targetData = clipboardInstance()->data(
+        targetMode, {mimeText});
+    if (!targetData.isEmpty()) {
+        const QByteArray target = targetData.value(mimeText).toByteArray();
+        const QString owner = targetData.value(mimeOwner).toString();
+        if ( owner.isEmpty() && !target.isEmpty() ) {
             const auto targetTextHash = m_data.value(COPYQ_MIME_PREFIX "target-text-hash").toByteArray().toUInt();
-            if (targetTextHash != qHash(targetText)) {
-                COPYQ_SYNC_LOG("Cancelled (target text changed)");
+            if (targetTextHash != qHash(target)) {
+                COPYQ_LOG(QStringLiteral("Sync: Cancelled - target text changed"));
                 return false;
             }
         }
 
         // Stop if the clipboard and selection text is already synchronized
         // or user selected text and copied it to clipboard.
-        if (sourceData && sourceText == targetText) {
-            COPYQ_SYNC_LOG("Cancelled (target is same as source)");
+        if (!sourceData.isEmpty() && source == target) {
+            COPYQ_LOG(QStringLiteral("Sync: Cancelled - target text is already same as source"));
             return false;
         }
     } else {
-        COPYQ_SYNC_LOG("Failed to fetch target data");
+        COPYQ_LOG(QStringLiteral("Sync: Failed to fetch target data"));
     }
 
+    if (m_abort != Abort::None) {
+        COPYQ_LOG(QStringLiteral("Sync: Aborting"));
+        return false;
+    }
+
+    m_data = sourceData;
     return true;
-#   undef COPYQ_SYNC_LOG
 #else
     Q_UNUSED(targetMode)
     return false;
@@ -3704,11 +3703,6 @@ PlatformClipboard *Scriptable::clipboardInstance()
     if (m_clipboard == nullptr)
         m_clipboard = platformNativeInterface()->clipboard();
     return m_clipboard.get();
-}
-
-const QMimeData *Scriptable::mimeData(ClipboardMode mode)
-{
-    return clipboardInstance()->mimeData(mode);
 }
 
 void Scriptable::interruptibleSleep(int msec)
@@ -3780,8 +3774,8 @@ void Scriptable::installObject(QObject *fromObj, const QMetaObject *metaObject, 
         // Allow passing variable number of arguments to scriptable methods
         // and handle exceptions.
         const auto v = hasByteArrayReturnType
-            ? m_createFnB.call(QJSValueList() << from << name)
-            : m_createFn.call(QJSValueList() << from << name);
+            ? m_createFnB.call({from, name})
+            : m_createFn.call({from, name});
         if ( v.isError() ) {
             log( QStringLiteral("Exception while wrapping %1.%2: %3").arg(fromObj->objectName(), name, v.toString()), LogError );
             Q_ASSERT(false);
@@ -3794,7 +3788,7 @@ void Scriptable::installObject(QObject *fromObj, const QMetaObject *metaObject, 
         const QMetaProperty prop = metaObject->property(i);
         const QLatin1String name( prop.name() );
 
-        const auto args = QJSValueList() << name << from;
+        const QJSValueList args{name, from};
         const auto v = m_createProperty.callWithInstance(toObject, args);
         if ( v.isError() ) {
             log( QStringLiteral("Exception while adding property %1.%2: %3").arg(fromObj->objectName(), name, v.toString()), LogError );

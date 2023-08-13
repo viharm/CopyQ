@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -465,6 +448,16 @@ bool syncInternalCommandChanges(const Command &command, QVector<Command> *allCom
     return true;
 }
 
+bool menuItemMatches(const QModelIndex &index, const QString &searchText)
+{
+    for (const int type : {contentType::text, contentType::notes}) {
+        const QString itemText = index.data(type).toString().toLower();
+        if ( itemText.contains(searchText.toLower()) )
+            return true;
+    }
+    return false;
+}
+
 } // namespace
 
 #ifdef WITH_NATIVE_NOTIFICATIONS
@@ -472,14 +465,17 @@ class SystemTrayIcon final : public KStatusNotifierItem {
     Q_OBJECT
 public:
     explicit SystemTrayIcon(QWidget *parent = nullptr)
-        : KStatusNotifierItem(QCoreApplication::applicationName(), parent)
+        : KStatusNotifierItem(QCoreApplication::applicationName())
     {
         setIcon(appIcon());
+        // Parent is not passed to the KStatusNotifierItem constructor because
+        // it calls KStatusNotifierItem::setAssociatedWidget() which breaks
+        // setting main window position.
+        setParent(parent);
         setStandardActionsEnabled(false);
         setTitle(QGuiApplication::applicationDisplayName());
         setToolTipTitle(QGuiApplication::applicationDisplayName());
         setCategory(KStatusNotifierItem::ApplicationStatus);
-        setAssociatedWidget(parent);
     }
 
     void setIcon(const QIcon &icon) { setIconByPixmap(icon); }
@@ -514,7 +510,9 @@ class SystemTrayIcon final : public QSystemTrayIcon {
 public:
     explicit SystemTrayIcon(QWidget *parent = nullptr)
         : QSystemTrayIcon(parent)
-    {}
+    {
+        setIcon(appIcon());
+    }
 };
 #endif
 
@@ -569,7 +567,6 @@ MainWindow::MainWindow(const ClipboardBrowserSharedPtr &sharedData, QWidget *par
     , m_trayMenu( new TrayMenu(this) )
     , m_tray(nullptr)
     , m_toolBar(new ToolBar(this))
-    , m_actionToggleClipboardStoring()
     , m_sharedData(sharedData)
     , m_menu( new TrayMenu(this) )
     , m_menuMaxItemCount(-1)
@@ -719,8 +716,14 @@ void MainWindow::exit()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    event->ignore();
     hideWindow();
+#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
+    event->accept();
+#else
+    // This is needed in older versions of Qt (tested in Qt 5.12.8),
+    // otherwise focusing is somewhat broken (test pasteFromMainWindow()).
+    event->ignore();
+#endif
     COPYQ_LOG("Got main window close event.");
 }
 
@@ -730,17 +733,14 @@ bool MainWindow::focusNextPrevChild(bool next)
     if (!c)
         return false;
 
-    // Fix tab order while searching in editor.
-    if (c->isInternalEditorOpen() && !browseMode()) {
-        if ( next && ui->searchBar->hasFocus() ) {
-            c->setFocus();
-            return true;
-        }
+    if ( next && ui->searchBar->hasFocus() ) {
+        c->setFocus();
+        return true;
+    }
 
-        if ( !next && c->hasFocus() ) {
-            ui->searchBar->setFocus();
-            return true;
-        }
+    if ( !next && c->hasFocus() && !browseMode() ) {
+        ui->searchBar->setFocus();
+        return true;
     }
 
     // Focus floating preview dock.
@@ -806,9 +806,7 @@ void MainWindow::createMenu()
     createAction( Actions::File_ProcessManager, &MainWindow::showProcessManagerDialog, menu );
 
     // - enable/disable
-    m_actionToggleClipboardStoring = createAction( Actions::File_ToggleClipboardStoring,
-                                                   &MainWindow::toggleClipboardStoring, menu );
-    updateMonitoringActions();
+    createAction( Actions::File_ToggleClipboardStoring, &MainWindow::toggleClipboardStoring, menu );
 
     // - separator
     menu->addSeparator();
@@ -1120,11 +1118,8 @@ void MainWindow::onItemCommandActionTriggered(CommandAction *commandAction, cons
         }
     }
 
-    if (command.remove) {
-        const int lastRow = c->removeIndexes(selected);
-        if (lastRow != -1)
-            c->setCurrent(lastRow);
-    }
+    if (command.remove)
+        c->removeIndexes(selected);
 
     if (command.hideWindow)
         hideWindow();
@@ -1318,12 +1313,18 @@ void MainWindow::onActionDialogAccepted(const Command &command, const QStringLis
 
 void MainWindow::onSearchShowRequest(const QString &text)
 {
-    enterSearchMode();
-    if (m_options.viMode && text == "/")
+    if (m_enteringSearchMode)
         return;
+    m_enteringSearchMode = true;
 
-    ui->searchBar->setText(text);
-    ui->searchBar->end(false);
+    enterSearchMode();
+
+    if (!m_options.viMode || text != "/") {
+        ui->searchBar->setText(text);
+        ui->searchBar->end(false);
+    }
+
+    m_enteringSearchMode = false;
 }
 
 void MainWindow::runDisplayCommands()
@@ -1393,17 +1394,6 @@ void MainWindow::updateWindowTransparency(bool mouseOver)
 {
     int opacity = 100 - (mouseOver || isActiveWindow() ? m_options.transparencyFocused : m_options.transparency);
     setWindowOpacity(opacity / 100.0);
-}
-
-void MainWindow::updateMonitoringActions()
-{
-    if ( !m_actionToggleClipboardStoring.isNull() ) {
-        m_actionToggleClipboardStoring->setIcon(
-                    getIcon("", m_clipboardStoringDisabled ? IconCheck : IconBan));
-        m_actionToggleClipboardStoring->setText( m_clipboardStoringDisabled
-                                                 ? tr("&Enable Clipboard Storing")
-                                                 : tr("&Disable Clipboard Storing") );
-    }
 }
 
 ClipboardBrowserPlaceholder *MainWindow::getPlaceholder(int index) const
@@ -1719,8 +1709,6 @@ void MainWindow::setTrayEnabled(bool enable)
                      this, &MainWindow::trayActivated );
         }
 
-        updateIcon();
-
         m_tray->show();
 
         if ( isMinimized() )
@@ -1841,11 +1829,8 @@ void MainWindow::addMenuItems(TrayMenu *menu, ClipboardBrowserPlaceholder *place
     int itemCount = 0;
     for ( int i = 0; i < c->length() && itemCount < maxItemCount; ++i ) {
         const QModelIndex index = c->model()->index(i, 0);
-        if ( !searchText.isEmpty() ) {
-            const QString itemText = index.data(contentType::text).toString().toLower();
-            if ( !itemText.contains(searchText.toLower()) )
-                continue;
-        }
+        if ( !searchText.isEmpty() && !menuItemMatches(index, searchText) )
+            continue;
         const QVariantMap data = index.data(contentType::data).toMap();
         menu->addClipboardItemAction(data, m_options.trayImages);
         ++itemCount;
@@ -1965,7 +1950,7 @@ bool MainWindow::exportDataV4(QDataStream *out, const QStringList &tabs, bool ex
 
             QVariantMap commandMap;
             for ( const auto &key : settings.allKeys() )
-                commandMap[key] = serializableValue(settings.constSettingsData(), key);
+                commandMap[key] = serializableValue(settings, key);
 
             commandsList.append(commandMap);
         }
@@ -2431,7 +2416,7 @@ void MainWindow::showError(const QString &msg)
     auto notification = createNotification( QString::number(notificationId) );
     notification->setTitle( tr("CopyQ Error", "Notification error message title") );
     notification->setMessage(msg);
-    notification->setIcon(IconTimesCircle);
+    notification->setIcon(IconCircleXmark);
 }
 
 Notification *MainWindow::createNotification(const QString &id)
@@ -2514,13 +2499,15 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     }
 
     // Allow browsing items in search mode without focusing item list.
-    if (c && !browseMode()) {
+    if ( c && ui->searchBar->hasFocus() ) {
         switch(key) {
             case Qt::Key_Down:
             case Qt::Key_Up:
             case Qt::Key_PageDown:
             case Qt::Key_PageUp:
+                c->setFocus();
                 QCoreApplication::sendEvent(c, event);
+                ui->searchBar->setFocus();
                 return;
         }
     }
@@ -2642,6 +2629,7 @@ void MainWindow::loadSettings(QSettings &settings, AppConfig *appConfig)
 
     m_trayMenu->setRowIndexFromOne(m_sharedData->rowIndexFromOne);
     m_menu->setRowIndexFromOne(m_sharedData->rowIndexFromOne);
+    m_sharedData->theme.setRowIndexFromOne(m_sharedData->rowIndexFromOne);
 
     m_options.transparency = appConfig->option<Config::transparency>();
     m_options.transparencyFocused = appConfig->option<Config::transparency_focused>();
@@ -2757,7 +2745,7 @@ void MainWindow::loadTheme(const QSettings &themeSettings)
     {
         Settings settings;
         settings.beginGroup("Theme");
-        m_sharedData->theme.saveTheme(settings.settingsData());
+        m_sharedData->theme.saveTheme(&settings);
         settings.endGroup();
     }
 
@@ -3084,8 +3072,13 @@ QString MainWindow::configDescription()
     QStringList options = configurationManager.options();
     options.sort();
     QString opts;
-    for (const auto &option : options)
-        opts.append( option + "\n  " + configurationManager.optionToolTip(option).replace('\n', "\n  ") + '\n' );
+    AppConfig appConfig;
+    configurationManager.loadSettings(&appConfig);
+    for (const auto &option : options) {
+        const QString description = configurationManager.optionToolTip(option).replace('\n', "\n  ");
+        const QString value = configurationManager.optionValue(option).toString().replace('\n', "\\n");
+        opts.append( QStringLiteral("%1=%2\n  %3\n").arg(option, value, description) );
+    }
     return opts;
 }
 
@@ -3311,7 +3304,7 @@ void MainWindow::activateCurrentItemHelper()
 
 void MainWindow::onItemClicked()
 {
-    if (m_singleClickActivate)
+    if (m_singleClickActivate && QGuiApplication::keyboardModifiers() == Qt::NoModifier)
         activateCurrentItem();
 }
 
@@ -3329,14 +3322,11 @@ void MainWindow::disableClipboardStoring(bool disable)
     m_clipboardStoringDisabled = disable;
     emit disableClipboardStoringRequest(disable);
 
-    updateMonitoringActions();
-
     ::setSessionIconEnabled(!disable);
 
     updateIcon();
 
-    if (m_clipboardStoringDisabled)
-        runScript("setTitle(); showDataNotification()");
+    runScript("setTitle(); showDataNotification()");
 
     COPYQ_LOG( QString("Clipboard monitoring %1.")
                .arg(m_clipboardStoringDisabled ? "disabled" : "enabled") );

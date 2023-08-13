@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "scriptableproxy.h"
 
@@ -94,13 +77,13 @@ namespace {
 const quint32 serializedFunctionCallMagicNumber = 0x58746908;
 const quint32 serializedFunctionCallVersion = 2;
 
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
 void registerMetaTypes() {
     static bool registered = false;
     if (registered)
         return;
 
-    qRegisterMetaType< QPointer<QWidget> >("QPointer<QWidget>");
+#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
+    qRegisterMetaType<QPointer<QWidget>>("QPointer<QWidget>");
     qRegisterMetaTypeStreamOperators<ClipboardMode>("ClipboardMode");
     qRegisterMetaTypeStreamOperators<Command>("Command");
     qRegisterMetaTypeStreamOperators<NamedValueList>("NamedValueList");
@@ -108,12 +91,23 @@ void registerMetaTypes() {
     qRegisterMetaTypeStreamOperators<ScriptablePath>("ScriptablePath");
     qRegisterMetaTypeStreamOperators<QVector<int>>("QVector<int>");
     qRegisterMetaTypeStreamOperators<QVector<Command>>("QVector<Command>");
-    qRegisterMetaTypeStreamOperators<QVector<QVariantMap>>("QVector<QVariantMap>");
+    qRegisterMetaTypeStreamOperators<VariantMapList>("VariantMapList");
     qRegisterMetaTypeStreamOperators<Qt::KeyboardModifiers>("Qt::KeyboardModifiers");
+#else
+    qRegisterMetaType<QPointer<QWidget>>("QPointer<QWidget>");
+    qRegisterMetaType<ClipboardMode>("ClipboardMode");
+    qRegisterMetaType<Command>("Command");
+    qRegisterMetaType<NamedValueList>("NamedValueList");
+    qRegisterMetaType<NotificationButtons>("NotificationButtons");
+    qRegisterMetaType<ScriptablePath>("ScriptablePath");
+    qRegisterMetaType<QVector<int>>("QVector<int>");
+    qRegisterMetaType<QVector<Command>>("QVector<Command>");
+    qRegisterMetaType<VariantMapList>("VariantMapList");
+    qRegisterMetaType<Qt::KeyboardModifiers>("Qt::KeyboardModifiers");
+#endif
 
     registered = true;
 }
-#endif
 
 template<typename Predicate>
 void selectionRemoveIf(QList<QPersistentModelIndex> *indexes, Predicate predicate)
@@ -189,20 +183,25 @@ void selectionRemoveInvalid(QList<QPersistentModelIndex> *indexes)
 
 Q_DECLARE_METATYPE(QFile*)
 
-QDataStream &operator<<(QDataStream &out, const NotificationButton &button)
+QDataStream &operator<<(QDataStream &out, const NotificationButtons &list)
 {
-    out << button.name
-        << button.script
-        << button.data;
+    out << list.size();
+    for (const auto &button : list)
+        out << button.name << button.script << button.data;
     Q_ASSERT(out.status() == QDataStream::Ok);
     return out;
 }
 
-QDataStream &operator>>(QDataStream &in, NotificationButton &button)
+QDataStream &operator>>(QDataStream &in, NotificationButtons &list)
 {
-    in >> button.name
-       >> button.script
-       >> button.data;
+    decltype(list.size()) size;
+    in >> size;
+    list.reserve(size);
+    for (int i = 0; i < size; ++i) {
+        NotificationButton button;
+        in >> button.name >> button.script >> button.data;
+        list.append(button);
+    }
     Q_ASSERT(in.status() == QDataStream::Ok);
     return in;
 }
@@ -218,13 +217,28 @@ QDataStream &operator<<(QDataStream &out, const NamedValueList &list)
 
 QDataStream &operator>>(QDataStream &in, NamedValueList &list)
 {
-    int size;
+    decltype(list.size()) size;
     in >> size;
+    list.reserve(size);
     for (int i = 0; i < size; ++i) {
         NamedValue item;
         in >> item.name >> item.value;
         list.append(item);
     }
+    Q_ASSERT(in.status() == QDataStream::Ok);
+    return in;
+}
+
+QDataStream &operator<<(QDataStream &out, const VariantMapList &items)
+{
+    out << items.items;
+    Q_ASSERT(out.status() == QDataStream::Ok);
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, VariantMapList &items)
+{
+    in >> items.items;
     Q_ASSERT(in.status() == QDataStream::Ok);
     return in;
 }
@@ -833,9 +847,8 @@ ScriptableProxy::ScriptableProxy(MainWindow *mainWindow, QObject *parent)
                  emit abortEvaluation();
              } );
 
-#if QT_VERSION < QT_VERSION_CHECK(6,0,0)
     registerMetaTypes();
-#else
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
     Q_ASSERT(QMetaType::fromType<Command>().hasRegisteredDataStreamOperators());
     Q_ASSERT(QMetaType::fromType<ClipboardMode>().hasRegisteredDataStreamOperators());
 #endif
@@ -928,7 +941,7 @@ QByteArray ScriptableProxy::callFunctionHelper(const QByteArray &serializedFunct
         auto &value = arguments[i];
         const int argumentTypeId = metaMethod.parameterType(i);
         if (argumentTypeId == QMetaType::QVariant) {
-            args[i] = Q_ARG(QVariant, value);
+            args[i] = QGenericArgument( "QVariant", static_cast<void*>(value.data()) );
         } else if ( value.userType() == argumentTypeId ) {
             args[i] = QGenericArgument( value.typeName(), static_cast<void*>(value.data()) );
         } else {
@@ -956,8 +969,8 @@ QByteArray ScriptableProxy::callFunctionHelper(const QByteArray &serializedFunct
         returnValue = QVariant(typeId, nullptr);
 #endif
         const auto genericReturnValue = returnValue.isValid()
-                ? QGenericReturnArgument(returnValue.typeName(), static_cast<void*>(returnValue.data()) )
-                : Q_RETURN_ARG(QVariant, returnValue);
+                ? QGenericReturnArgument( returnValue.typeName(), static_cast<void*>(returnValue.data()) )
+                : QGenericReturnArgument( "QVariant", static_cast<void*>(returnValue.data()) );
 
         called = metaMethod.invoke(
                 this, genericReturnValue,
@@ -1329,18 +1342,11 @@ QString ScriptableProxy::browserRemoveRows(const QString &tabName, QVector<int> 
             indexes.append(indexToRemove);
     }
 
-    const QPersistentModelIndex currentIndex = c->currentIndex();
-
     QString error;
-    const int lastRow = c->removeIndexes(indexes, &error);
+    c->removeIndexes(indexes, &error);
 
     if ( !error.isEmpty() )
         return error;
-
-    if ( !currentIndex.isValid() ) {
-        const int currentRow = qMin(lastRow, c->length() - 1);
-        c->setCurrent(currentRow);
-    }
 
     return QString();
 }
@@ -1405,7 +1411,7 @@ int ScriptableProxy::findTabIndex(const QString &arg1)
     return m_wnd->findTabIndex(arg1);
 }
 
-int ScriptableProxy::menuItems(const QVector<QVariantMap> &items)
+int ScriptableProxy::menuItems(const VariantMapList &items)
 {
     INVOKE(menuItems, (items));
 
@@ -1415,7 +1421,7 @@ int ScriptableProxy::menuItems(const QVector<QVariantMap> &items)
 
     const auto addMenuItems = [&](const QString &searchText) {
         menu.clearClipboardItems();
-        for (const QVariantMap &data : items) {
+        for (const QVariantMap &data : items.items) {
             const QString text = getTextData(data);
             if ( text.contains(searchText, Qt::CaseInsensitive) )
                 menu.addClipboardItemAction(data, true);
@@ -1430,7 +1436,7 @@ int ScriptableProxy::menuItems(const QVector<QVariantMap> &items)
     if (act == nullptr)
         return -1;
 
-    return items.indexOf(act->data().toMap());
+    return items.items.indexOf(act->data().toMap());
 }
 
 void ScriptableProxy::openActionDialog(const QVariantMap &arg1)
@@ -1513,7 +1519,7 @@ bool ScriptableProxy::browserOpenEditor(const QString &tabName, const QByteArray
     return c && c->openEditor(arg1, changeClipboard);
 }
 
-QString ScriptableProxy::browserInsert(const QString &tabName, int row, const QVector<QVariantMap> &items)
+QString ScriptableProxy::browserInsert(const QString &tabName, int row, const VariantMapList &items)
 {
     INVOKE(browserInsert, (tabName, row, items));
 
@@ -1521,10 +1527,10 @@ QString ScriptableProxy::browserInsert(const QString &tabName, int row, const QV
     if (!c)
         return QLatin1String("Invalid tab");
 
-    if ( !c->allocateSpaceForNewItems(items.size()) )
+    if ( !c->allocateSpaceForNewItems(items.items.size()) )
         return QLatin1String("Tab is full (cannot remove any items)");
 
-    for (const auto &item : items) {
+    for (const auto &item : items.items) {
         if ( !c->add(item, row) )
             return QLatin1String("Failed to new add items");
     }
@@ -1532,7 +1538,7 @@ QString ScriptableProxy::browserInsert(const QString &tabName, int row, const QV
     return QString();
 }
 
-QString ScriptableProxy::browserChange(const QString &tabName, int row, const QVector<QVariantMap> &items)
+QString ScriptableProxy::browserChange(const QString &tabName, int row, const VariantMapList &items)
 {
     INVOKE(browserChange, (tabName, row, items));
 
@@ -1541,7 +1547,7 @@ QString ScriptableProxy::browserChange(const QString &tabName, int row, const QV
         return QLatin1String("Invalid tab");
 
     int currentRow = row;
-    for (const auto &data : items) {
+    for (const auto &data : items.items) {
         const auto index = c->index(currentRow);
         QVariantMap itemData = c->model()->data(index, contentType::data).toMap();
         for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
@@ -1657,13 +1663,13 @@ bool ScriptableProxy::setSelectedItemData(int selectedIndex, const QVariantMap &
     return c->model()->setData(index, data, contentType::data);
 }
 
-QVector<QVariantMap> ScriptableProxy::selectedItemsData()
+VariantMapList ScriptableProxy::selectedItemsData()
 {
     INVOKE(selectedItemsData, ());
 
     auto c = currentBrowser();
     if (!c)
-        return QVector<QVariantMap>();
+        return {};
 
     const auto model = c->model();
 
@@ -1678,10 +1684,10 @@ QVector<QVariantMap> ScriptableProxy::selectedItemsData()
         }
     }
 
-    return dataList;
+    return {dataList};
 }
 
-void ScriptableProxy::setSelectedItemsData(const QVector<QVariantMap> &dataList)
+void ScriptableProxy::setSelectedItemsData(const VariantMapList &dataList)
 {
     INVOKE2(setSelectedItemsData, (dataList));
 
@@ -1692,12 +1698,12 @@ void ScriptableProxy::setSelectedItemsData(const QVector<QVariantMap> &dataList)
     const auto model = c->model();
 
     const auto indexes = selectedIndexes();
-    const auto count = std::min( indexes.size(), dataList.size() );
+    const auto count = std::min( indexes.size(), dataList.items.size() );
     for ( int i = 0; i < count; ++i ) {
         const auto &index = indexes[i];
         if ( index.isValid() ) {
             Q_ASSERT( index.model() == model );
-            model->setData(index, dataList[i], contentType::data);
+            model->setData(index, dataList.items[i], contentType::data);
         }
     }
 }
@@ -1986,6 +1992,28 @@ void ScriptableProxy::selectionMove(int id, int row)
 
     if ( !indexes.isEmpty() )
         selection.browser->move(indexes, row);
+}
+
+void ScriptableProxy::selectionSort(int id, const QVector<int> &indexes)
+{
+    INVOKE2(selectionSort, (id, indexes));
+
+    auto selection = m_selections.value(id);
+
+    QList<QPersistentModelIndex> sorted;
+    sorted.reserve( indexes.size() );
+    for (const int i : indexes) {
+        if (i < 0 || i >= selection.indexes.size())
+            continue;
+
+        const auto index = selection.indexes[i];
+        if ( index.isValid() )
+            sorted.append(index);
+    }
+    selection.indexes = sorted;
+
+    if ( !sorted.isEmpty() )
+        selection.browser->sortItems(sorted);
 }
 
 #ifdef HAS_TESTS
@@ -2390,8 +2418,11 @@ void ScriptableProxy::setTitle(const QString &title)
     INVOKE2(setTitle, (title));
 
     if (title.isEmpty()) {
-        m_wnd->setWindowTitle(QString());
-        m_wnd->setTrayTooltip(QGuiApplication::applicationDisplayName());
+        const QString defaultTitle = isMonitoringEnabled()
+            ? QString()
+            : tr("*Clipboard Storing Disabled*", "Main window title if clipboard storing is disabled");
+        m_wnd->setWindowTitle(defaultTitle);
+        m_wnd->setTrayTooltip(defaultTitle);
     } else {
         m_wnd->setWindowTitle(title);
         m_wnd->setTrayTooltip(title);

@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef APPCONFIG_H
 #define APPCONFIG_H
@@ -76,7 +59,7 @@ struct notification_position : Config<int> {
 
 struct clipboard_notification_lines : Config<int> {
     static QString name() { return "clipboard_notification_lines"; }
-    static Value value(Value v) { return qBound(0, v, 10000); }
+    static Value value(Value v) { return qBound(0, v, 100); }
 };
 
 struct notification_horizontal_offset : Config<int> {
@@ -410,7 +393,7 @@ struct save_on_app_deactivated : Config<bool> {
 struct native_menu_bar : Config<bool> {
     static QString name() { return "native_menu_bar"; }
 #ifdef Q_OS_MAC
-    // Native menu bar does't show on macOS.
+    // Native menu bar doesn't show on macOS.
     // See: https://github.com/hluk/CopyQ/issues/1444
     static Value defaultValue() { return false; }
 #else

@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef SCRIPTABLE_H
 #define SCRIPTABLE_H
@@ -51,6 +34,7 @@ class Scriptable final : public QObject
     Q_OBJECT
     Q_PROPERTY(QJSValue inputSeparator READ getInputSeparator WRITE setInputSeparator)
     Q_PROPERTY(QJSValue mimeText READ getMimeText CONSTANT)
+    Q_PROPERTY(QJSValue mimeTextUtf8 READ getMimeTextUtf8 CONSTANT)
     Q_PROPERTY(QJSValue mimeHtml READ getMimeHtml CONSTANT)
     Q_PROPERTY(QJSValue mimeUriList READ getMimeUriList CONSTANT)
     Q_PROPERTY(QJSValue mimeWindowTitle READ getMimeWindowTitle CONSTANT)
@@ -134,6 +118,7 @@ public:
     void installObject(QObject *fromObj, const QMetaObject *metaObject, QJSValue &toObject);
 
     QJSValue getMimeText() const { return mimeText; }
+    QJSValue getMimeTextUtf8() const { return mimeTextUtf8; }
     QJSValue getMimeHtml() const { return mimeHtml; }
     QJSValue getMimeUriList() const { return mimeUriList; }
     QJSValue getMimeWindowTitle() const { return mimeWindowTitle; }
@@ -400,7 +385,7 @@ private:
     void onExecuteOutput(const QByteArray &output);
     void onMonitorClipboardChanged(const QVariantMap &data, ClipboardOwnership ownership);
     void onMonitorClipboardUnchanged(const QVariantMap &data);
-    void onSynchronizeSelection(ClipboardMode sourceMode, const QString &text, uint targetTextHash);
+    void onSynchronizeSelection(ClipboardMode sourceMode, uint sourceTextHash, uint targetTextHash);
 
     bool sourceScriptCommands();
     void callDisplayFunctions(QJSValueList displayFunctions);
@@ -455,7 +440,6 @@ private:
     QJSValue readInput();
 
     PlatformClipboard *clipboardInstance();
-    const QMimeData *mimeData(ClipboardMode mode);
 
     void interruptibleSleep(int msec);
 

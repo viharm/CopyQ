@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -572,9 +555,6 @@ private:
 
     void updateWindowTransparency(bool mouseOver = false);
 
-    /** Update name and icon of "disable/enable monitoring" menu actions. */
-    void updateMonitoringActions();
-
     /** Return browser widget in given tab @a index. */
     ClipboardBrowserPlaceholder *getPlaceholder(int index) const;
 
@@ -664,7 +644,6 @@ private:
     MainWindowOptions m_options;
 
     bool m_clipboardStoringDisabled = false;
-    QPointer<QAction> m_actionToggleClipboardStoring;
 
     ClipboardBrowserSharedPtr m_sharedData;
 
@@ -713,6 +692,7 @@ private:
 
     bool m_isActiveWindow = false;
     bool m_singleClickActivate = 0;
+    bool m_enteringSearchMode = false;
 };
 
 #endif // MAINWINDOW_H

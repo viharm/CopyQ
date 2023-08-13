@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "configurationmanager.h"
 #include "ui_configurationmanager.h"
@@ -174,12 +157,12 @@ void ConfigurationManager::initTabIcons()
     ItemOrderList *list = ui->itemOrderList;
     list->setItemsMovable(false);
     list->appendItem( tr("General"), getIcon("", IconWrench), makeTab(m_tabGeneral, this) );
-    list->appendItem( tr("Layout"), getIcon("", IconColumns), makeTab(m_tabLayout, this) );
-    list->appendItem( tr("History"), getIcon("", IconThList), makeTab(m_tabHistory, this) );
+    list->appendItem( tr("Layout"), getIcon("", IconTableColumns), makeTab(m_tabLayout, this) );
+    list->appendItem( tr("History"), getIcon("", IconList), makeTab(m_tabHistory, this) );
     list->appendItem( tr("Tray"), getIcon("", IconInbox), makeTab(m_tabTray, this) );
-    list->appendItem( tr("Notifications"), getIcon("", IconInfoCircle), makeTab(m_tabNotifications, this) );
+    list->appendItem( tr("Notifications"), getIcon("", IconCircleInfo), makeTab(m_tabNotifications, this) );
     list->appendItem( tr("Tabs"), getIconFromResources("tab_rename"), makeTab(&m_tabTabs, this) );
-    list->appendItem( tr("Items"), getIcon("", IconThList), makeTab(&m_tabItems, this) );
+    list->appendItem( tr("Items"), getIcon("", IconList), makeTab(&m_tabItems, this) );
     list->appendItem( tr("Shortcuts"), getIcon("", IconKeyboard), makeTab(&m_tabShortcuts, this) );
     list->appendItem( tr("Appearance"), getIcon("", IconImage), makeTab(&m_tabAppearance, this) );
 }
@@ -459,11 +442,11 @@ void ConfigurationManager::loadSettings(AppConfig *appConfig)
     settings.endGroup();
 
     settings.beginGroup("Shortcuts");
-    m_tabShortcuts->loadShortcuts(settings.constSettingsData());
+    m_tabShortcuts->loadShortcuts(settings);
     settings.endGroup();
 
     settings.beginGroup("Theme");
-    m_tabAppearance->loadTheme(settings.constSettingsData());
+    m_tabAppearance->loadTheme(settings);
     settings.endGroup();
 
     m_tabAppearance->setEditor( appConfig->option<Config::editor>() );
@@ -539,16 +522,16 @@ void ConfigurationManager::apply(AppConfig *appConfig)
         settings.setValue( it.key(), it.value().value() );
     settings.endGroup();
 
-    m_tabTabs->saveTabs(settings.settingsData());
+    m_tabTabs->saveTabs(&settings);
 
     // Save configuration without command line alternatives only if option widgets are initialized
     // (i.e. clicked OK or Apply in configuration dialog).
     settings.beginGroup("Shortcuts");
-    m_tabShortcuts->saveShortcuts(settings.settingsData());
+    m_tabShortcuts->saveShortcuts(&settings);
     settings.endGroup();
 
     settings.beginGroup("Theme");
-    m_tabAppearance->saveTheme(settings.settingsData());
+    m_tabAppearance->saveTheme(&settings);
     settings.endGroup();
 
     // Save settings for each plugin.
@@ -569,7 +552,7 @@ void ConfigurationManager::apply(AppConfig *appConfig)
         if (w) {
             PluginWidget *pluginWidget = qobject_cast<PluginWidget *>(w);
             const auto &loader = pluginWidget->loader();
-            loader->applySettings(*settings.settingsData());
+            loader->applySettings(settings);
         }
 
         const bool isPluginEnabled = m_tabItems->isItemChecked(i);

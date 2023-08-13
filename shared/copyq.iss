@@ -3,23 +3,43 @@
 ; 3. Compile "setup.exe".
 
 ; Path for output installation file
-#define Output "."
+#define Output                   "."
+#define MyAppName                "CopyQ"
+#define MyAppNameMin             "copyq"
+#define MyAppCopyright           "Lukas Holecek"
+#define MyAppCopyrightStartYear  "2009"
+#define MyAppCopyrightEndYear    GetDateTimeString('yyyy','','')
 
 [Setup]
 AppId={{9DF1F443-EA0B-4C75-A4D3-767A7783228E}
-AppName=CopyQ
+AppName={#MyAppName}
 AppVersion={#AppVersion}
-AppVerName=CopyQ {#AppVersion}
-AppPublisher=Lukas Holecek
+AppVerName={#MyAppName} {#AppVersion}
+
+AppCopyright={#MyAppCopyright} {#MyAppCopyrightStartYear}-{#MyAppCopyrightEndYear}
+AppPublisher={#MyAppCopyright}
+
 AppPublisherURL=http://hluk.github.io/CopyQ/
 AppSupportURL=http://hluk.github.io/CopyQ/
 AppUpdatesURL=http://hluk.github.io/CopyQ/
-DefaultDirName={pf}\CopyQ
-DefaultGroupName=CopyQ
+
+VersionInfoDescription={#MyAppName} installer
+VersionInfoProductName={#MyAppName} {#AppVersion}
+VersionInfoVersion={#AppVersion}
+
+UninstallDisplayName={#MyAppName} {#AppVersion}
+UninstallDisplayIcon={#Root}\copyq.exe
+
+WizardStyle=Modern
+UsePreviousLanguage=no
+
+DefaultDirName={pf}\{#MyAppName}
+DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile={#Source}\LICENSE
 OutputDir={#Output}
-OutputBaseFilename=copyq-{#AppVersion}-setup
+PrivilegesRequiredOverridesAllowed=dialog
+OutputBaseFilename={#MyAppNameMin}-{#AppVersion}-setup
 Compression=lzma
 SolidCompression=yes
 SetupIconFile={#Source}\src\images\icon.ico
@@ -27,19 +47,13 @@ WizardImageFile=logo.bmp
 WizardSmallImageFile=logo-small.bmp
 CloseApplications=force
 
-VersionInfoDescription=CopyQ installer
-VersionInfoProductName=CopyQ {#AppVersion}
-VersionInfoVersion={#AppVersion}
-UninstallDisplayName=CopyQ {#AppVersion}
-UninstallDisplayIcon={#Root}\copyq.exe
-AppCopyright=(c) Lukas Holecek
-
 [Languages]
 Name: en; MessagesFile: "compiler:Default.isl"
 Name: cz; MessagesFile: "compiler:Languages\Czech.isl"
 Name: de; MessagesFile: "compiler:Languages\German.isl"
 Name: es; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: it; MessagesFile: "compiler:Languages\Italian.isl"
+Name: ko; MessagesFile: "Languages\Korean.isl"
 
 [CustomMessages]
 en.ProgramFiles=Program Files
@@ -88,6 +102,19 @@ it.PluginFakeVim=Editor FakeVim
 it.PluginSynchronize=Sincronizza elementi disco
 it.PluginTags=Etichette elementi
 it.PluginPinned=Elementi bloccati
+
+ko.ProgramFiles=Program Files
+ko.Translations=번역
+ko.Plugins=플러그인
+ko.PluginText=강조 표시가 있는 텍스트
+ko.PluginImages=이미지
+ko.PluginWeb=웹 페이지
+ko.PluginNotes=노트
+ko.PluginEncrypted=암호화
+ko.PluginFakeVim=FakeVim 편집기
+ko.PluginSynchronize=항목을 디스크에 동기화
+ko.PluginTags=항목 태그
+ko.PluginPinned=고정된 항목
 
 [Types]
 Name: "full"; Description: "{code:GetFullInstallation}"

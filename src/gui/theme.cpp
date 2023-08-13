@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "theme.h"
 
@@ -163,35 +146,22 @@ int fitFontWeight(int weight, int low, int high, int highCss)
 
 int getFontWeightForStyleSheet(int weight)
 {
-    // Copied from QFont sources (not available in all Qt versions).
-    enum Weight {
-        Thin     = 0,    // 100
-        ExtraLight = 12, // 200
-        Light    = 25,   // 300
-        Normal   = 50,   // 400
-        Medium   = 57,   // 500
-        DemiBold = 63,   // 600
-        Bold     = 75,   // 700
-        ExtraBold = 81,  // 800
-        Black    = 87    // 900
-    };
-
-    if (weight < ExtraLight)
-        return fitFontWeight(weight, Thin, ExtraLight, 200);
-    if (weight < Light)
-        return fitFontWeight(weight, ExtraLight, Light, 300);
-    if (weight < Normal)
-        return fitFontWeight(weight, Light, Normal, 400);
-    if (weight < Medium)
-        return fitFontWeight(weight, Normal, Medium, 500);
-    if (weight < DemiBold)
-        return fitFontWeight(weight, Medium, DemiBold, 600);
-    if (weight < Bold)
-        return fitFontWeight(weight, DemiBold, Bold, 700);
-    if (weight < ExtraBold)
-        return fitFontWeight(weight, Bold, ExtraBold, 800);
-    if (weight < Black)
-        return fitFontWeight(weight, ExtraBold, Black, 900);
+    if (weight < QFont::ExtraLight)
+        return fitFontWeight(weight, QFont::Thin, QFont::ExtraLight, 200);
+    if (weight < QFont::Light)
+        return fitFontWeight(weight, QFont::ExtraLight, QFont::Light, 300);
+    if (weight < QFont::Normal)
+        return fitFontWeight(weight, QFont::Light, QFont::Normal, 400);
+    if (weight < QFont::Medium)
+        return fitFontWeight(weight, QFont::Normal, QFont::Medium, 500);
+    if (weight < QFont::DemiBold)
+        return fitFontWeight(weight, QFont::Medium, QFont::DemiBold, 600);
+    if (weight < QFont::Bold)
+        return fitFontWeight(weight, QFont::DemiBold, QFont::Bold, 700);
+    if (weight < QFont::ExtraBold)
+        return fitFontWeight(weight, QFont::Bold, QFont::ExtraBold, 800);
+    if (weight < QFont::Black)
+        return fitFontWeight(weight, QFont::ExtraBold, QFont::Black, 900);
 
     return 900;
 }
@@ -231,12 +201,6 @@ QString getFontStyleSheet(const QString &fontString, double scale = 1.0)
     result.append(";");
 
     return result;
-}
-
-int itemMargin()
-{
-    const int dpi = QGuiApplication::primaryScreen()->physicalDotsPerInchX();
-    return std::max(2, dpi / 72);
 }
 
 QString themePrefix()
@@ -541,12 +505,13 @@ void Theme::resetTheme()
     m_theme["css_template_main_window"] = Option("main_window");
     m_theme["css_template_notification"] = Option("notification");
     m_theme["css_template_menu"] = Option("menu");
+
+    m_theme["num_margin"] = Option(2);
 }
 
 void Theme::updateTheme()
 {
-    const auto margin = itemMargin();
-    m_margins = QSize(margin + 2, margin);
+    m_margins = QSize(2, 2);
 
     // search style
     m_searchPalette.setColor(QPalette::Base, color("find_bg"));
@@ -562,10 +527,21 @@ void Theme::updateTheme()
     m_showRowNumber = value("show_number").toBool();
     m_rowNumberPalette.setColor(QPalette::Text, color("num_fg"));
     m_rowNumberFont = font("num_font");
-    m_rowNumberSize = QFontMetrics(m_rowNumberFont).boundingRect( QLatin1String("0123") ).size()
-            + QSize(m_margins.width(), m_margins.height());
+    m_rowNumberFontMetrics = QFontMetrics(m_rowNumberFont);
+    const QVariant rowNumberMargin = value("num_margin");
+    m_rowNumberMargin = rowNumberMargin.canConvert<int>() ? rowNumberMargin.toInt() : 2;
 
     m_antialiasing = value("font_antialiasing").toBool();
+}
+
+QSize Theme::rowNumberSize(int n) const
+{
+    if (!m_showRowNumber)
+        return QSize(0, 0);
+
+    const QString number = QString::number(n + m_rowIndexFromOne);
+    return m_rowNumberFontMetrics.boundingRect(number).size()
+        + m_margins + QSize(m_rowNumberMargin, 0);
 }
 
 void Theme::decorateBrowser(QAbstractScrollArea *c) const

@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "clipboardserver.h"
 
@@ -98,53 +81,6 @@ void setTabWidth(QTextEdit *editor, int spaces)
 #endif
 }
 
-/// Move commands to separate config file.
-void migrateCommands(const QString &commandConfigPath)
-{
-    Settings oldSettings;
-    const auto oldCommands = loadCommands(&oldSettings.constSettingsData());
-
-    const QString commandConfigPathNew = commandConfigPath + QStringLiteral(".new");
-    {
-        Settings newSettings(commandConfigPathNew);
-        saveCommands(oldCommands, newSettings.settingsData());
-    }
-
-    {
-        QSettings newSettings(commandConfigPathNew, QSettings::IniFormat);
-        const auto newCommands = loadCommands(&newSettings);
-        if ( newCommands != oldCommands ) {
-            log( QString("Failed to save commands in new file %1")
-                 .arg(commandConfigPathNew), LogError );
-            return;
-        }
-    }
-
-    if ( !QFile::rename(commandConfigPathNew, commandConfigPath) ) {
-        log( QString("Failed to save commands in new file %1")
-             .arg(commandConfigPath), LogError );
-        return;
-    }
-
-    oldSettings.remove("Commands");
-    oldSettings.remove("Command");
-}
-
-void restoreConfiguration()
-{
-    Settings().restore();
-
-    const QString commandConfigPath = getConfigurationFilePath("-commands.ini");
-    if ( QFile::exists(commandConfigPath) ) {
-        const QString staleCommandConfigPathBakup =
-            commandConfigPath + QStringLiteral(".new.bak");
-        QFile::remove(staleCommandConfigPathBakup);
-        Settings(commandConfigPath).restore();
-    } else {
-        migrateCommands(commandConfigPath);
-    }
-}
-
 } // namespace
 
 ClipboardServer::ClipboardServer(QApplication *app, const QString &sessionName)
@@ -160,8 +96,6 @@ ClipboardServer::ClipboardServer(QApplication *app, const QString &sessionName)
     m_server = new Server(serverName, this);
 
     if ( m_server->isListening() ) {
-        Settings::canModifySettings = true;
-        restoreConfiguration();
         App::installTranslator();
         qApp->setLayoutDirection(QLocale().textDirection());
         COPYQ_LOG("Server \"" + serverName + "\" started.");
@@ -713,7 +647,7 @@ void ClipboardServer::loadSettings(AppConfig *appConfig)
 
     COPYQ_LOG("Loading configuration");
 
-    QSettings &settings = appConfig->settings().constSettingsData();
+    QSettings &settings = appConfig->settings();
 
     m_sharedData->itemFactory->loadItemFactorySettings(&settings);
 

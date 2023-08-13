@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "common/common.h"
 
@@ -122,7 +105,7 @@ public:
         {
             const auto t = m_elapsed.elapsed();
             if (t > 500)
-                log( QString("ELAPSED %1 ms acessing \"%2\"").arg(t).arg(m_format), LogWarning );
+                log( QString("ELAPSED %1 ms accessing \"%2\"").arg(t).arg(m_format), LogWarning );
         }
     private:
         QString m_format;
@@ -172,7 +155,7 @@ public:
         if (!refresh())
             return QImage();
 
-        // NOTE: Application hangs if using mulitple sessions and
+        // NOTE: Application hangs if using multiple sessions and
         //       calling QMimeData::hasImage() on X11 clipboard.
         COPYQ_LOG_VERBOSE("Fetching image data from clipboard");
         const QImage image = m_dataGuard->imageData().value<QImage>();
@@ -244,7 +227,7 @@ QString getImageFormatFromMime(const QString &mime)
 }
 
 /**
- * Sometimes only Qt internal image data are available in cliboard,
+ * Sometimes only Qt internal image data are available in clipboard,
  * so this tries to convert the image data (if available) to given format.
  */
 void cloneImageData(
@@ -362,8 +345,6 @@ QVariantMap cloneData(const QMimeData &rawData, QStringList formats, bool *abort
 {
     ClipboardDataGuard data(rawData, abortCloning);
 
-    const auto internalMimeTypes = {mimeOwner, mimeWindowTitle, mimeItemNotes, mimeHidden};
-
     QVariantMap newdata;
 
     /*
@@ -394,11 +375,6 @@ QVariantMap cloneData(const QMimeData &rawData, QStringList formats, bool *abort
         }
     }
 
-    for (const auto &internalMime : internalMimeTypes) {
-        if ( data.hasFormat(internalMime) )
-            newdata.insert( internalMime, data.data(internalMime) );
-    }
-
     // Retrieve images last since this can take a while.
     if ( !imageFormats.isEmpty() ) {
         const QImage image = data.getImageData();
@@ -420,12 +396,22 @@ QVariantMap cloneData(const QMimeData &rawData, QStringList formats, bool *abort
 
 QVariantMap cloneData(const QMimeData &data)
 {
+    static const QSet<QString> ignoredFormats({
+        mimeOwner,
+        mimeClipboardMode,
+        mimeCurrentTab,
+        mimeSelectedItems,
+        mimeCurrentItem,
+        mimeShortcut,
+        mimeOutputTab,
+    });
+
     QStringList formats;
 
     for ( const auto &mime : data.formats() ) {
         // ignore uppercase mimetypes (e.g. UTF8_STRING, TARGETS, TIMESTAMP)
-        // and internal type to check clipboard owner
-        if ( !mime.isEmpty() && mime[0].isLower() )
+        // and specific internal types
+        if ( !mime.isEmpty() && mime[0].isLower() && !ignoredFormats.contains(mime) )
             formats.append(mime);
     }
 

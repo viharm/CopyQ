@@ -2,11 +2,10 @@
 set -e
 
 distros=(
-    bionic
     focal
-    hirsute
-    impish
     jammy
+    kinetic
+    lunar
 )
 
 sed -i 's/quilt/native/' 'debian/source/format'

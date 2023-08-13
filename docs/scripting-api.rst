@@ -128,21 +128,33 @@ unlike in GUI, where row numbers start from 1 by default.
 
    Shows main window.
 
+   This uses the last window position and size which is updated whenever the
+   window is moved or resized.
+
 .. js:function:: /*tab*/ show(tabName)
 
    Shows tab.
+
+   This uses the last window position and size which is updated whenever the
+   window is moved or resized.
 
 .. js:function:: showAt(x, y, [width, height])
 
    Shows main window with given geometry.
 
+   The new window position and size will not be stored for ``show()``.
+
 .. js:function:: /*cursor*/ showAt()
 
    Shows main window under mouse cursor.
 
+   The new window position will not be stored for ``show()``.
+
 .. js:function:: /*tab*/ showAt(x, y, width, height, tabName)
 
    Shows tab with given geometry.
+
+   The new window position and size will not be stored for ``show()``.
 
 .. js:function:: hide()
 
@@ -151,6 +163,9 @@ unlike in GUI, where row numbers start from 1 by default.
 .. js:function:: toggle()
 
    Shows or hides main window.
+
+   This uses the last window position and size which is updated whenever the
+   window is moved or resized.
 
    :returns: ``true`` only if main window is being shown, otherwise ``false``.
    :rtype: bool
@@ -258,14 +273,14 @@ unlike in GUI, where row numbers start from 1 by default.
 
    Returns true only if clipboard contains MIME type.
 
-   :returns: ``true`` if clipboad contans the format, otherwise ``false``.
+   :returns: ``true`` if clipboad contains the format, otherwise ``false``.
    :rtype: bool
 
 .. js:function:: hasSelectionFormat(mimeType)
 
    Same as :js:func:`hasClipboardFormat` for `Linux mouse selection`_.
 
-   :returns: ``true`` if selection contans the format, otherwise ``false``.
+   :returns: ``true`` if selection contains the format, otherwise ``false``.
    :rtype: bool
 
 .. js:function:: isClipboard()
@@ -1530,7 +1545,7 @@ unlike in GUI, where row numbers start from 1 by default.
    :returns: Formats to get and save automatically from clipboard.
    :rtype: array of strings
 
-   Override the funtion, for example, to save only plain text:
+   Override the function, for example, to save only plain text:
 
    .. code-block:: js
 
@@ -1773,6 +1788,16 @@ Types
        sel.invert()
        sel.items();
 
+   Example - sort items alphabetically:
+
+   .. code-block:: js
+
+       var sel = ItemSelection().selectAll();
+       const texts = sel.itemsFormat(mimeText);
+       sel.sort(function(i,j){
+           return texts[i] < texts[j];
+       });
+
    .. js:attribute:: tab
 
        Tab name
@@ -1852,6 +1877,19 @@ Types
    .. js:method:: move(row)
 
        Move all items in the selection to the target row.
+
+       :returns: self
+       :rtype: ItemSelection
+
+   .. js:method:: sort(row)
+
+       Sort items with a comparison function.
+
+       The comparison function takes two arguments, indexes to the selection,
+       and returns true only if the item in the selection under the first index
+       should be sorted above the item under the second index.
+
+       Items will be reordered in the tab and in the selection object.
 
        :returns: self
        :rtype: ItemSelection

@@ -94,15 +94,13 @@
         <translation>Сохранить объекты во вкладке с данным именем (оставьте пустым для сохранения в текущей вкладке)</translation>
     </message>
     <message>
-        <location filename="../src/gui/actiondialog.cpp" line="218"/>
         <source>Command saved</source>
-        <translation>Команда сохранена</translation>
+        <translation type="vanished">Команда сохранена</translation>
     </message>
     <message>
-        <location filename="../src/gui/actiondialog.cpp" line="219"/>
         <source>Command was saved and can be accessed from item menu.
 You can set up the command in preferences.</source>
-        <translation>Команда была сохранена и теперь она доступна из меню объектов.
+        <translation type="vanished">Команда была сохранена и теперь она доступна из меню объектов.
 Вы можете настроить команду в настройках.</translation>
     </message>
 </context>
@@ -782,7 +780,7 @@ Note: If this is applied automatically, no other automatic commands are executed
     <message>
         <location filename="../src/ui/commandwidget.ui" line="382"/>
         <source>&lt;p&gt;Use command only for items copied to clipboard from window with title text that matches this regular expression (leave empty to match any window). On macOS, this contains the application name followed by a dash (&amp;quot;-&amp;quot;) then the window title. E.g. &amp;quot;Safari - GitHub&amp;quot;.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;Используйте команду только для объектов, скопированных в буфер обмена из окна с заголовком текста, совпадающим с обычным выражением (оставьте пустым, чтобы подходило к каждому окну). В macOS это включает в себя название приложения с последующими тире &amp;quot;-&amp;quot; и заголовком окна. Например &amp;quot;Safari - GitHub&amp;quot;&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;Используйте команду только для объектов, скопированных в буфер обмена из окна с заголовком текста, совпадающим с обычным выражением (оставьте пустым, чтобы подходило к каждому окну). В macOS это включает в себя название приложения с последующими тире &amp;quot;-&amp;quot; и заголовком окна. Например &amp;quot;Safari - GitHub&amp;quot;.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/commandwidget.ui" line="541"/>
@@ -1111,7 +1109,7 @@ press F2 to edit.</source>
     <message>
         <location filename="../src/ui/configtabgeneral.ui" line="179"/>
         <source>Auto-complete Commands</source>
-        <translation>Автовыполнение команд</translation>
+        <translation>Автодополнение команд</translation>
     </message>
     <message>
         <location filename="../src/ui/configtabgeneral.ui" line="186"/>
@@ -1265,17 +1263,17 @@ Use Item Preview to display whole items.</source>
     <message>
         <location filename="../src/ui/configtabhistory.ui" line="230"/>
         <source>Activate item with single click</source>
-        <translation>Активировать объект по одному щелчку</translation>
+        <translation>Активировать объект по одному нажатию</translation>
     </message>
     <message>
         <location filename="../src/ui/configtabhistory.ui" line="240"/>
         <source>After item is activated (double-click or Enter key), copy it to clipboard and ...</source>
-        <translation>По активации объекта (двойным щелчком или клавишей Enter) копировать его в буфер обмена и...</translation>
+        <translation>После активации объекта (двойным нажатием или клавишей Enter) скопировать его в буфер обмена и...</translation>
     </message>
     <message>
         <location filename="../src/ui/configtabhistory.ui" line="246"/>
         <source>Move item to the top of the list after it is activated</source>
-        <translation>Переместить объект в верхнюю часть списка по его активации</translation>
+        <translation>Переместить объект в верхнюю часть списка после его активации</translation>
     </message>
     <message>
         <location filename="../src/ui/configtabhistory.ui" line="249"/>
@@ -1463,12 +1461,11 @@ Note: This is not supported on all systems.</source>
 Set to 0 to disable this.
 
 Set to -1 to keep visible until clicked.</source>
-        <translation>Интервал отображения уведомления (в секундах) для нового содержимого буфера обмена
-или когда объект скопирован в буфер обмена (только если главное окно закрыто).
+        <translation>Интервал отображения уведомления (в секундах) о новом содержимом буфере обмена или когда элемент скопирован в буфер обмена (только если главное окно закрыто).
 
 Укажите 0, чтобы отключить.
 
-Укажите -1, чтобы отображать до момента щелчка мышью.</translation>
+Укажите -1, чтобы отображать до момента нажатия мыши.</translation>
     </message>
     <message>
         <location filename="../src/ui/configtabnotifications.ui" line="173"/>
@@ -1502,7 +1499,7 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../src/ui/configtabnotifications.ui" line="239"/>
         <source>Notification distance from left or right screen edge in screen points</source>
-        <translation>Расстояние уведомлений от левого или правого края экрана (в пикселях)</translation>
+        <translation>Расстояние уведомлений от левого или правого края экрана в пикселях</translation>
     </message>
     <message>
         <location filename="../src/ui/configtabnotifications.ui" line="267"/>
@@ -1512,7 +1509,7 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../src/ui/configtabnotifications.ui" line="279"/>
         <source>Notification distance from top or bottom screen edge in screen points</source>
-        <translation>Расстояние уведомлений от верхнего или нижнего края экрана (в пикселях)</translation>
+        <translation>Расстояние уведомлений от верхнего или нижнего края экрана в пикселях</translation>
     </message>
     <message>
         <location filename="../src/ui/configtabnotifications.ui" line="307"/>
@@ -1522,7 +1519,7 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../src/ui/configtabnotifications.ui" line="319"/>
         <source>Maximum width for notification in screen points</source>
-        <translation>Максимальная ширина для уведомлений (в пикселях)</translation>
+        <translation>Максимальная ширина для уведомлений в пикселях</translation>
     </message>
     <message>
         <location filename="../src/ui/configtabnotifications.ui" line="344"/>
@@ -1532,7 +1529,7 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../src/ui/configtabnotifications.ui" line="356"/>
         <source>Maximum height for notification in screen points</source>
-        <translation>Максимальная высота уведомлений (в пикселях)</translation>
+        <translation>Максимальная высота уведомлений в пикселях</translation>
     </message>
 </context>
 <context>
@@ -1672,7 +1669,7 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../src/gui/configurationmanager.cpp" line="500"/>
         <source>This action will reset all your preferences (in all tabs) to default values.&lt;br /&gt;&lt;br /&gt;Do you really want to &lt;strong&gt;reset all preferences&lt;/strong&gt;?</source>
-        <translation>Это действие сбросит все ваши настройки (во всех вкладках) на значения по умолчанию.&lt;br /&gt;&lt;br /&gt; Вы действительно хотите &lt;strong&gt;сбросить все настройки &lt;/strong&gt;?</translation>
+        <translation>Это действие сбросит все ваши настройки (во всех вкладках) на значений по умолчанию.&lt;br /&gt;&lt;br /&gt;Вы действительно хотите &lt;strong&gt;сбросить все настройки&lt;/strong&gt;?</translation>
     </message>
     <message>
         <location filename="../src/gui/configurationmanager.cpp" line="601"/>
@@ -1701,7 +1698,7 @@ Set to 0 to disable.</source>
 <context>
     <name>FilterCompleter</name>
     <message>
-        <location filename="../src/gui/filtercompleter.cpp" line="175"/>
+        <location filename="../src/gui/filtercompleter.cpp" line="189"/>
         <source>Alt+Down</source>
         <comment>Filter completion shortcut</comment>
         <translation>Alt+Вниз</translation>
@@ -1922,7 +1919,7 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../plugins/itemencrypted/itemencrypted.cpp" line="928"/>
         <source>Creating new keys (this may take a few minutes)...</source>
-        <translation>Создание новых клавиш (может занять несколько минут)...</translation>
+        <translation>Создаются новые ключи (может занять несколько минут)...</translation>
     </message>
     <message>
         <location filename="../plugins/itemencrypted/itemencrypted.cpp" line="929"/>
@@ -1943,7 +1940,7 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../plugins/itemencrypted/itemencrypted.cpp" line="937"/>
         <source>Generate New Keys...</source>
-        <translation>Генерация новых ключей...</translation>
+        <translation>Генерировать новые ключи...</translation>
     </message>
     <message>
         <location filename="../plugins/itemencrypted/itemencrypted.cpp" line="939"/>
@@ -1997,6 +1994,19 @@ Set to 0 to disable.</source>
     </message>
 </context>
 <context>
+    <name>ItemFactory</name>
+    <message>
+        <location filename="../src/item/itemfactory.cpp" line="91"/>
+        <source>Corrupted Tab</source>
+        <translation>Повреждённая вкладка</translation>
+    </message>
+    <message>
+        <location filename="../src/item/itemfactory.cpp" line="92"/>
+        <source>Not all items in the tab &lt;strong&gt;%1&lt;/strong&gt; were loaded successfully. Do you still want to load the tab and potentially lose some items?</source>
+        <translation>Не все элементы вкладки &lt;strong&gt;%1&lt;/strong&gt; были успешно загружены. Всё ещё хотите загрузить вкладку и возможно потерять некоторые элементы?</translation>
+    </message>
+</context>
+<context>
     <name>ItemFakeVimLoader</name>
     <message>
         <location filename="../plugins/itemfakevim/itemfakevim.h" line="42"/>
@@ -2006,7 +2016,7 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../plugins/itemfakevim/itemfakevim.h" line="44"/>
         <source>FakeVim plugin is part of Qt Creator</source>
-        <translation>Дополнение FakeVim это часть Qt Creator</translation>
+        <translation>Дополнение FakeVim — это часть Qt Creator</translation>
     </message>
     <message>
         <location filename="../plugins/itemfakevim/itemfakevim.h" line="46"/>
@@ -2050,7 +2060,7 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../plugins/itemimage/itemimagesettings.ui" line="34"/>
         <source>Maximum width of image displayed in history (set to zero for original size)</source>
-        <translation>Максимальная ширина изображения, отображаемого в истории (устанавливается на ноль для исходного размера)</translation>
+        <translation>Максимальная ширина изображения, отображаемого в истории (укажите ноль для исходного размера)</translation>
     </message>
     <message>
         <location filename="../plugins/itemimage/itemimagesettings.ui" line="59"/>
@@ -2080,7 +2090,7 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../plugins/itemimage/itemimagesettings.ui" line="136"/>
         <source>Editor command for SVG image format.</source>
-        <translation>Редактор для формата изображений SVG.</translation>
+        <translation>Команда редактора для формата изображений SVG.</translation>
     </message>
 </context>
 <context>
@@ -2179,12 +2189,12 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../plugins/itempinned/itempinned.cpp" line="200"/>
         <source>Unpin items first to remove them.</source>
-        <translation>Открепите объекты перед тем, как удалить.</translation>
+        <translation>Открепите объекты перед удалением.</translation>
     </message>
     <message>
         <location filename="../plugins/itempinned/itempinned.cpp" line="364"/>
         <source>Pin</source>
-        <translation>Прикрепить</translation>
+        <translation>Закрепить</translation>
     </message>
     <message>
         <location filename="../plugins/itempinned/itempinned.cpp" line="372"/>
@@ -2335,23 +2345,23 @@ Set to 0 to disable.</source>
         <translation>Удалить метку %1</translation>
     </message>
     <message>
-        <location filename="../plugins/itemtags/itemtags.cpp" line="625"/>
+        <location filename="../plugins/itemtags/itemtags.cpp" line="628"/>
         <source>Cannot Remove Items With a Locked Tag</source>
         <translation>Невозможно удалить объекты с заблокированной меткой</translation>
     </message>
     <message>
-        <location filename="../plugins/itemtags/itemtags.cpp" line="626"/>
+        <location filename="../plugins/itemtags/itemtags.cpp" line="629"/>
         <source>Untag items first to remove them.</source>
         <translation>Снимите метки с объектов перед тем, как удалить их.</translation>
     </message>
     <message>
-        <location filename="../plugins/itemtags/itemtags.cpp" line="762"/>
+        <location filename="../plugins/itemtags/itemtags.cpp" line="765"/>
         <source>Important</source>
         <comment>Tag name for example command</comment>
         <translation>Важный</translation>
     </message>
     <message>
-        <location filename="../plugins/itemtags/itemtags.cpp" line="786"/>
+        <location filename="../plugins/itemtags/itemtags.cpp" line="789"/>
         <source>Clear all tags</source>
         <translation>Очистить все метки</translation>
     </message>
@@ -2376,7 +2386,7 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../plugins/itemtags/itemtagssettings.ui" line="27"/>
         <source>More info is available on &lt;a href=&quot;https://copyq.readthedocs.io/en/latest/tags.html&quot;&gt;wiki page&lt;/a&gt;.</source>
-        <translation>Дополнительная информация доступна на &lt;a href=&quot;https://copyq.readthedocs.io/en/latest/tags.html&quot;&gt;wiki странице&lt;/a&gt;.</translation>
+        <translation>Дополнительная информация доступна на &lt;a href=&quot;https://copyq.readthedocs.io/en/latest/tags.html&quot;&gt;странице wiki&lt;/a&gt;.</translation>
     </message>
     <message>
         <location filename="../plugins/itemtags/itemtagssettings.ui" line="38"/>
@@ -2437,12 +2447,12 @@ Set to 0 to disable.</source>
     <message>
         <location filename="../plugins/itemtext/itemtextsettings.ui" line="26"/>
         <source>Maximum number of lines to display (0 to show all):</source>
-        <translation>Максимальное количество отображаемых строк (0 для отображения всех):</translation>
+        <translation>Максимум отображаемых строк (0 — все):</translation>
     </message>
     <message>
         <location filename="../plugins/itemtext/itemtextsettings.ui" line="60"/>
         <source>Maximum height in pixels (0 for no limit):</source>
-        <translation>Максимальная высота в пикселях (0 без ограничений):</translation>
+        <translation>Максимальная высота в пикселях (0 — неограниченно):</translation>
     </message>
     <message>
         <location filename="../plugins/itemtext/itemtextsettings.ui" line="92"/>
@@ -2518,8 +2528,8 @@ Set to 0 to disable.</source>
         <translation>&amp;Справка</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="2068"/>
-        <location filename="../src/gui/mainwindow.cpp" line="2190"/>
+        <location filename="../src/gui/mainwindow.cpp" line="2061"/>
+        <location filename="../src/gui/mainwindow.cpp" line="2183"/>
         <source>Options for Import</source>
         <translation>Параметры импорта</translation>
     </message>
@@ -2529,32 +2539,32 @@ Set to 0 to disable.</source>
         <translation>&amp;Показать/скрыть</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="3781"/>
+        <location filename="../src/gui/mainwindow.cpp" line="3771"/>
         <source>Options for Export</source>
         <translation>Параметры экспорта</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="3802"/>
+        <location filename="../src/gui/mainwindow.cpp" line="3792"/>
         <source>Export Error</source>
         <translation>Ошибка экспорта</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="3803"/>
+        <location filename="../src/gui/mainwindow.cpp" line="3793"/>
         <source>Failed to export file %1!</source>
         <translation>Не удалось экспортировать файл %1!</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="1411"/>
+        <location filename="../src/gui/mainwindow.cpp" line="1404"/>
         <source>&amp;Enable Clipboard Storing</source>
         <translation>&amp;Включить сохранение буфера обмена</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="1412"/>
+        <location filename="../src/gui/mainwindow.cpp" line="1405"/>
         <source>&amp;Disable Clipboard Storing</source>
-        <translation>&amp;Отключить хранение буфера обмена</translation>
+        <translation>&amp;Отключить сохранение буфера обмена</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="2439"/>
+        <location filename="../src/gui/mainwindow.cpp" line="2432"/>
         <source>CopyQ Error</source>
         <comment>Notification error message title</comment>
         <translation>Ошибка CopyQ</translation>
@@ -2601,32 +2611,32 @@ Set to 0 to disable.</source>
         <translation>Объекты CopyQ (*.cpq)</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="3895"/>
+        <location filename="../src/gui/mainwindow.cpp" line="3885"/>
         <source>Import Error</source>
         <translation>Ошибка импорта</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="3896"/>
+        <location filename="../src/gui/mainwindow.cpp" line="3886"/>
         <source>Failed to import file %1!</source>
         <translation>Не удалось импортировать файл %1!</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="4081"/>
+        <location filename="../src/gui/mainwindow.cpp" line="4071"/>
         <source>Remove All Tabs in Group?</source>
         <translation>Удалить все вкладки в группе?</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="4082"/>
+        <location filename="../src/gui/mainwindow.cpp" line="4072"/>
         <source>Do you want to remove &lt;strong&gt;all tabs&lt;/strong&gt; in group &lt;strong&gt;%1&lt;/strong&gt;?</source>
         <translation>Вы хотите удалить &lt;strong&gt;все вкладки&lt;/strong&gt; в группе &lt;strong&gt;%1&lt;/strong&gt;?</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="4129"/>
+        <location filename="../src/gui/mainwindow.cpp" line="4119"/>
         <source>Remove Tab?</source>
         <translation>Удалить вкладку ?</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="4130"/>
+        <location filename="../src/gui/mainwindow.cpp" line="4120"/>
         <source>Do you want to remove tab &lt;strong&gt;%1&lt;/strong&gt;?</source>
         <translation>Вы хотите удалить вкладку &lt;strong&gt;%1&lt;/strong&gt;?</translation>
     </message>
@@ -2642,41 +2652,41 @@ Set to 0 to disable.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/common/common.cpp" line="565"/>
+        <location filename="../src/common/common.cpp" line="570"/>
         <source>&lt;HIDDEN&gt;</source>
         <comment>Label for hidden/secret clipboard content</comment>
         <translation>&lt;Скрыто&gt;</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/common/common.cpp" line="571"/>
+        <location filename="../src/common/common.cpp" line="576"/>
         <source>%1 (%n lines)</source>
         <comment>Label for multi-line text in clipboard</comment>
         <translation>
             <numerusform>%1 (%n строка)</numerusform>
-            <numerusform>%1 (%n строк)</numerusform>
+            <numerusform>%1 (%n строки)</numerusform>
             <numerusform>%1 (%n строк)</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/common/common.cpp" line="581"/>
+        <location filename="../src/common/common.cpp" line="586"/>
         <source>&lt;IMAGE&gt;</source>
         <comment>Label for image in clipboard</comment>
-        <translation>&lt;Изображение&gt;</translation>
+        <translation>&lt;ИЗОБРАЖЕНИЕ&gt;</translation>
     </message>
     <message>
-        <location filename="../src/common/common.cpp" line="583"/>
+        <location filename="../src/common/common.cpp" line="588"/>
         <source>&lt;ITEMS&gt;</source>
         <comment>Label for copied items in clipboard</comment>
         <translation>&lt;ОБЪЕКТЫ&gt;</translation>
     </message>
     <message>
-        <location filename="../src/common/common.cpp" line="585"/>
+        <location filename="../src/common/common.cpp" line="590"/>
         <source>&lt;EMPTY&gt;</source>
         <comment>Label for empty clipboard</comment>
-        <translation>&lt;Пусто&gt;</translation>
+        <translation>&lt;ПУСТО&gt;</translation>
     </message>
     <message>
-        <location filename="../src/common/common.cpp" line="587"/>
+        <location filename="../src/common/common.cpp" line="592"/>
         <source>&lt;DATA&gt;</source>
         <comment>Label for data in clipboard</comment>
         <translation>&lt;ДАННЫЕ&gt;</translation>
@@ -2711,8 +2721,8 @@ Set to 0 to disable.</source>
         <location filename="../src/main.cpp" line="238"/>
         <source>Session name must contain at most 16 characters
 which can be letters, digits, &apos;-&apos; or &apos;_&apos;!</source>
-        <translation>Название сессии должно содержать не более 16 символов,
-которые могут быть буквами, цифрами, &apos;-&apos; или &apos;_&apos;!</translation>
+        <translation>Название сеанса должно содержать не более 16 символов,
+которые могут быть буквами, цифрами, «-» или «_»!</translation>
     </message>
     <message>
         <location filename="../src/common/appconfig.cpp" line="39"/>
@@ -2778,7 +2788,7 @@ which can be letters, digits, &apos;-&apos; or &apos;_&apos;!</source>
     <message>
         <location filename="../src/gui/menuitems.cpp" line="79"/>
         <source>&amp;Toggle Clipboard Storing</source>
-        <translation>&amp;Переключение сохранения буфера обмена</translation>
+        <translation>П&amp;ереключить хранение буфера обмена</translation>
     </message>
     <message>
         <location filename="../src/gui/menuitems.cpp" line="80"/>
@@ -2941,7 +2951,7 @@ which can be letters, digits, &apos;-&apos; or &apos;_&apos;!</source>
     <message>
         <location filename="../src/gui/menuitems.cpp" line="148"/>
         <source>Ctrl+Home</source>
-        <translation>CTRL + HOME</translation>
+        <translation>Ctrl+Home</translation>
     </message>
     <message>
         <location filename="../src/gui/menuitems.cpp" line="149"/>
@@ -2951,7 +2961,7 @@ which can be letters, digits, &apos;-&apos; or &apos;_&apos;!</source>
     <message>
         <location filename="../src/gui/menuitems.cpp" line="150"/>
         <source>Ctrl+End</source>
-        <translation>CTRL+END</translation>
+        <translation>Ctrl+End</translation>
     </message>
     <message>
         <location filename="../src/gui/menuitems.cpp" line="152"/>
@@ -2971,7 +2981,7 @@ which can be letters, digits, &apos;-&apos; or &apos;_&apos;!</source>
     <message>
         <location filename="../src/gui/menuitems.cpp" line="155"/>
         <source>Ctrl+F2</source>
-        <translation>CTRL + F2</translation>
+        <translation>Ctrl+F2</translation>
     </message>
     <message>
         <location filename="../src/gui/menuitems.cpp" line="156"/>
@@ -3013,7 +3023,7 @@ which can be letters, digits, &apos;-&apos; or &apos;_&apos;!</source>
     <message>
         <location filename="../src/gui/menuitems.cpp" line="174"/>
         <source>Open Item Context Menu</source>
-        <translation>Открыть в контекстном меню</translation>
+        <translation>Открыть контекстное меню объектов</translation>
     </message>
     <message>
         <location filename="../src/gui/menuitems.cpp" line="175"/>
@@ -3107,7 +3117,7 @@ which can be letters, digits, &apos;-&apos; or &apos;_&apos;!</source>
         <location filename="../src/gui/menuitems.cpp" line="127"/>
         <source>A&amp;ctivate Items</source>
         <comment>copies selected items to clipboard and moves them to top (depending on settings)</comment>
-        <translation>А&amp;активировать объекты</translation>
+        <translation>&amp;Активировать объекты</translation>
     </message>
     <message>
         <location filename="../src/gui/menuitems.cpp" line="138"/>
@@ -3135,7 +3145,7 @@ which can be letters, digits, &apos;-&apos; or &apos;_&apos;!</source>
         <translation>&amp;Справка</translation>
     </message>
     <message>
-        <location filename="../src/item/itemfactory.cpp" line="418"/>
+        <location filename="../src/item/itemfactory.cpp" line="442"/>
         <source>Tab %1 is corrupted or some CopyQ plugins are missing!</source>
         <translation>Вкладка %1 повреждена или отсутствуют некоторые плагины CopyQ!</translation>
     </message>
@@ -3192,7 +3202,7 @@ which can be letters, digits, &apos;-&apos; or &apos;_&apos;!</source>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="85"/>
         <source>Print clipboard content.</source>
-        <translation>Печать содержимого буфера обмена.</translation>
+        <translation>Вывести содержимое буфера обмена.</translation>
     </message>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="86"/>
@@ -3208,7 +3218,7 @@ which can be letters, digits, &apos;-&apos; or &apos;_&apos;!</source>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="89"/>
         <source>Print X11 selection content.</source>
-        <translation>Печать содержимого выделения X11.</translation>
+        <translation>Вывести содержимое выделения X11.</translation>
     </message>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="93"/>
@@ -3246,7 +3256,7 @@ Set clipboard content.</source>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="108"/>
         <source>Copy item in the row to clipboard.</source>
-        <translation>Копировать объект из строки в буфер обмена.</translation>
+        <translation>Скопировать объект из строки в буфер обмена.</translation>
     </message>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="109"/>
@@ -3305,12 +3315,12 @@ Value -1 is for current text in clipboard.</source>
         <location filename="../src/scriptable/commandhelp.cpp" line="131"/>
         <location filename="../src/scriptable/commandhelp.cpp" line="148"/>
         <source>SEPARATOR</source>
-        <translation>Разделитель</translation>
+        <translation>РАЗДЕЛИТЕЛЬ</translation>
     </message>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="133"/>
         <source>Print raw data of clipboard or item in row.</source>
-        <translation>Печать необработанных данных буфера обмена или объекта в строке.</translation>
+        <translation>Вывести необработанные данные буфера обмена или объекта в строке.</translation>
     </message>
     <message>
         <source>
@@ -3412,7 +3422,7 @@ Arguments are accessible using with &quot;arguments[0..N]&quot;.</source>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="106"/>
         <source>Print amount of items in current tab.</source>
-        <translation>Печатать число объектов в текущей вкладке.</translation>
+        <translation>Вывести число объектов в текущей вкладке.</translation>
     </message>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="135"/>
@@ -3435,19 +3445,19 @@ Use %1 in PROGRAM to pass text as argument.</source>
         <location filename="../src/scriptable/commandhelp.cpp" line="162"/>
         <location filename="../src/scriptable/commandhelp.cpp" line="196"/>
         <location filename="../src/scriptable/commandhelp.cpp" line="205"/>
-        <location filename="../src/scriptable/scriptable.cpp" line="124"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="125"/>
         <source>COMMAND</source>
         <translation>КОМАНДА</translation>
     </message>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="164"/>
         <source>Remove tab.</source>
-        <translation>Вкладка удалить.</translation>
+        <translation>Удалить вкладку.</translation>
     </message>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="167"/>
         <source>Rename tab.</source>
-        <translation>Переименуйте вкладку.</translation>
+        <translation>Переименовать вкладку.</translation>
     </message>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="169"/>
@@ -3540,7 +3550,7 @@ Starts or connects to application instance with given session name.</source>
     <message>
         <location filename="../src/scriptable/commandhelp.cpp" line="193"/>
         <source>SESSION</source>
-        <translation>СЕССИЯ</translation>
+        <translation>СЕАНС</translation>
     </message>
     <message>
         <source>
@@ -3555,92 +3565,92 @@ Print version of program and libraries.</source>
 Печатать версию программы и библиотек.</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="124"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="125"/>
         <source>Usage: copyq [%1]</source>
         <translation>Использование: copyq [%1]</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="125"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="126"/>
         <source>Starts server if no command is specified.</source>
         <translation>Запускает сервер, если команда не указана.</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="126"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="127"/>
         <source>  COMMANDs:</source>
-        <translation>  Команды:</translation>
+        <translation>  КОМАНДЫ:</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="131"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="132"/>
         <source>NOTES:</source>
         <translation>ЗАМЕТКИ:</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="133"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="134"/>
         <source>  - Use double-dash argument (--) to read all following arguments without
     expanding escape sequences (i.e. \n, \t and others).</source>
         <translation>  - Используйте аргумент двойного тире (--) для чтения всех следующих аргументов
 без расширения экранированной последовательности (например, \n, \t и другие).</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="135"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="136"/>
         <source>  - Use ? for MIME to print available MIME types (default is &quot;text/plain&quot;).</source>
-        <translation>  - Используйте для MIME символ ? для распечатки доступных MIME-типов (по умолчанию — «text/plain»).</translation>
+        <translation>  - Используйте для MIME символ ? для вывода доступных MIME-типов (по умолчанию — «text/plain»).</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="140"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="141"/>
         <source>Invalid number of arguments!</source>
         <translation>Неверное число аргументов!</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="937"/>
-        <location filename="../src/scriptable/scriptable.cpp" line="972"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="942"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="977"/>
         <source>CopyQ Clipboard Manager</source>
         <translation>Диспетчер буфера обмена CopyQ</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="984"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="989"/>
         <source>Command not found!</source>
         <translation>Команда не найдена!</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="1083"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="1088"/>
         <source>Terminating server.
 </source>
-        <translation>Сервер завершает работу.
+        <translation>Прекращается работа сервера.
 </translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="3051"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="3056"/>
         <source>Exception</source>
         <translation>Исключение</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="3052"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="3057"/>
         <source>Exception in %1</source>
         <translation>Исключение в %1</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="3156"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="3161"/>
         <source>Failed to copy to clipboard!</source>
         <translation>Не удаётся скопировать в буфер обмена!</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="850"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="855"/>
         <source>Cannot save to file &quot;%1&quot;!</source>
         <translation>Не удаётся сохранить в файл «%1»!</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="132"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="133"/>
         <source>  - Use dash argument (-) to read data from standard input.</source>
-        <translation>  -Используйте аргумент тире (-) для чтения данных из стандартного ввода.</translation>
+        <translation>  - Используйте аргумент тире (-) для чтения данных из стандартного ввода.</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="855"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="860"/>
         <source>Cannot import file &quot;%1&quot;!</source>
         <translation>Не удаётся импортировать файл «%1»!</translation>
     </message>
     <message>
-        <location filename="../src/scriptable/scriptable.cpp" line="1603"/>
+        <location filename="../src/scriptable/scriptable.cpp" line="1608"/>
         <source>Invalid option &quot;%1&quot;!</source>
         <translation>Недопустимый параметр «%1»!</translation>
     </message>
@@ -3746,9 +3756,9 @@ Print version of program and libraries.</source>
     <message>
         <location filename="../src/ui/tabdialog.ui" line="29"/>
         <source>Tab name must be non-empty and unique.&lt;br /&gt;
-Tab &lt;b&gt;No&amp;amp;tes&lt;/b&gt; can be opened using &lt;b&gt;Alt+t&lt;/b&gt;.&lt;br /&gt;
+Tab &lt;b&gt;No&amp;amp;tes&lt;/b&gt; can be opened using &lt;b&gt;Alt+T&lt;/b&gt;.&lt;br /&gt;
 Use &lt;b&gt;/&lt;/b&gt; as path separator in tree view tab layout.</source>
-        <translation>Имя вкладки должно быть не пустым и уникальным.&lt;br /&gt; 
+        <translation>Имя вкладки должно быть не пустым и уникальным.&lt;br /&gt;
 Вкладку &lt;b&gt;Заметки&lt;/b&gt; можно открыть с помощью &lt;b&gt;Alt+T&lt;/b&gt;.&lt;br /&gt;
 Используйте &lt;b&gt;/&lt;/b&gt; в качестве разделителя пути в оформлении вкладок в виде дерева.</translation>
     </message>

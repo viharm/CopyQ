@@ -3,7 +3,7 @@ This is step-by-step description on how to release new version of CopyQ.
 # Verify the Builds
 
 - [copyq-beta Ubuntu package](https://launchpad.net/~hluk/+archive/ubuntu/copyq-beta)
-- [copyq-beta on OBS](https://build.opensuse.org/package/show/home:lukho:copyq-beta/CopyQ-Qt5-beta)
+- [copyq on OBS](https://build.opensuse.org/package/show/home:lukho:copyq/CopyQ-Qt5)
 - [Windows builds](https://ci.appveyor.com/project/hluk/copyq)
 
 # Update Version and Changelog
@@ -33,6 +33,16 @@ Build on [OBS](https://build.opensuse.org/package/show/home:lukho:copyq/CopyQ-Qt
     ./create_beta_package.sh
     $EDITOR debian.changelog
     osc commit
+
+NOTE: In case of system package conflicts like the following one, update
+[project
+configuration](https://build.opensuse.org/projects/home:lukho:copyq/prjconf)
+(for example: `Prefer: clang13-libs util-linux-core`).
+
+    have choice for libclang.so.13()(64bit) needed by qt5-doctools: clang-libs
+    clang13-libs, have choice for libclang.so.13(LLVM_13)(64bit) needed by
+    qt5-doctools: clang-libs clang13-libs, have choice for (util-linux-core or
+    util-linux) needed by systemd: util-linux util-linux-core
 
 Update [flathub package](https://github.com/flathub/com.github.hluk.copyq):
 

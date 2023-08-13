@@ -1,11 +1,10 @@
+cmake_minimum_required(VERSION 3.16)
 project(copyq)
 
 if (APPLE)
-    cmake_minimum_required(VERSION 3.1)
     set(COPYQ_EXECUTABLE_NAME "CopyQ")
 else()
-    cmake_minimum_required(VERSION 2.8.12)
-    set(COPYQ_EXECUTABLE_NAME ${PROJECT_NAME})
+    set(COPYQ_EXECUTABLE_NAME copyq)
 endif()
 
 # C++17
@@ -25,6 +24,8 @@ OPTION(PEDANTIC "Enable all compiler warnings" OFF)
 # Options (cmake -LH)
 OPTION(WITH_TESTS "Run test cases from command line" ${COPYQ_DEBUG})
 OPTION(WITH_PLUGINS "Compile plugins" ON)
+
+add_definitions( -DQT_USE_STRINGBUILDER  )
 
 # Unix-specific options
 if (UNIX AND NOT APPLE)
@@ -97,14 +98,12 @@ if (PEDANTIC)
             -Wlogical-op
             -Wnoexcept
             -Wstrict-null-sentinel
+            -Wno-unknown-pragmas
             )
     else()
         list(APPEND copyq_pedantic_flags
             -Weverything
             -Winconsistent-missing-override
-            )
-
-        list(APPEND copyq_pedantic_flags
             -Wno-c++98-compat
             -Wno-c++98-compat-pedantic
             -Wno-disabled-macro-expansion

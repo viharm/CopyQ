@@ -1,21 +1,4 @@
-/*
-    Copyright (c) 2020, Lukas Holecek <hluk@email.cz>
-
-    This file is part of CopyQ.
-
-    CopyQ is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    CopyQ is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with CopyQ.  If not, see <http://www.gnu.org/licenses/>.
-*/
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "app/applicationexceptionhandler.h"
 #include "common/log.h"
@@ -274,30 +257,6 @@ QGuiApplication *WinPlatform::createTestApplication(int &argc, char **argv)
 PlatformClipboardPtr WinPlatform::clipboard()
 {
     return PlatformClipboardPtr(new WinPlatformClipboard());
-}
-
-int WinPlatform::keyCode(const QKeyEvent &event)
-{
-    const int key = event.key();
-
-    // Some keys shouldn't be translated.
-    if ( key == Qt::Key_Return
-      || key == Qt::Key_Enter
-      || key == Qt::Key_Escape
-      || key == Qt::Key_Tab
-      || key == Qt::Key_Backtab
-      || key == Qt::Key_Backspace
-         )
-    {
-        return key;
-    }
-
-    const quint32 vk = event.nativeVirtualKey();
-    const UINT result = MapVirtualKeyW(vk, MAPVK_VK_TO_CHAR);
-    if (result != 0)
-        return result;
-
-    return key;
 }
 
 QStringList WinPlatform::getCommandLineArguments(int, char**)
